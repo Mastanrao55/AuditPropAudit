@@ -42,7 +42,15 @@ export class MemStorage implements IStorage {
     const message: ContactMessage = {
       ...insertMessage,
       id,
-      phone: insertMessage.phone || null,
+      phone: insertMessage.phone ?? null,
+      company: insertMessage.company ?? null,
+      jobTitle: insertMessage.jobTitle ?? null,
+      companySize: insertMessage.companySize ?? null,
+      industry: insertMessage.industry ?? null,
+      budget: insertMessage.budget ?? null,
+      timeline: insertMessage.timeline ?? null,
+      interests: insertMessage.interests ?? null,
+      hearAboutUs: insertMessage.hearAboutUs ?? null,
       createdAt: new Date(),
     };
     this.contactMessages.set(id, message);

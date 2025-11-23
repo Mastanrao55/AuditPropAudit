@@ -125,6 +125,11 @@ Preferred communication style: Simple, everyday language.
 - RBI CIBIL integration for financial history
 - Bank loan records and cheque bounce databases
 
+**Payment Processing**
+- Status: Deferred (user to decide later)
+- Available options: Stripe connector or PayPal integration
+- Not yet implemented
+
 **Asset Management**
 - Custom Vite plugin (`vite-plugin-meta-images`) for OpenGraph image URL management
 - Static assets served from `client/public` directory

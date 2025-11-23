@@ -13,6 +13,8 @@ import DataSources from "@/pages/data-sources";
 import Pricing from "@/pages/pricing";
 import APIPage from "@/pages/api";
 import SignIn from "@/pages/sign-in";
+import AuditReports from "@/pages/audit-reports";
+import Settings from "@/pages/settings";
 
 function Router() {
   return (
@@ -20,6 +22,8 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/review" component={ReviewQueue} />
+      <Route path="/reports" component={AuditReports} />
+      <Route path="/settings" component={Settings} />
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/solutions" component={Solutions} />
       <Route path="/data-sources" component={DataSources} />

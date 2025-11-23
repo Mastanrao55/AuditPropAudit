@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Shield, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
@@ -13,40 +14,60 @@ export default function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { login } = useAuth();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate sign-in delay
-    setTimeout(() => {
-      if (email && password) {
-        toast({
-          title: "Welcome Back!",
-          description: `Logged in as ${email}. Redirecting to dashboard...`,
-        });
-        // Navigate to dashboard
-        setTimeout(() => navigate("/dashboard"), 1000);
-      } else {
-        toast({
-          title: "Error",
-          description: "Please enter both email and password.",
-        });
-      }
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleDemoAccess = () => {
-    setEmail("demo@auditprop.com");
-    setPassword("demo123");
-    setTimeout(() => {
+    if (!email || !password) {
       toast({
-        title: "Demo Account",
-        description: "Using demo credentials. Redirecting to dashboard...",
+        title: "Error",
+        description: "Please enter both email and password.",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await login(email, password);
+      toast({
+        title: "Welcome Back!",
+        description: `Logged in as ${email}. Redirecting to dashboard...`,
       });
       setTimeout(() => navigate("/dashboard"), 1000);
-    }, 500);
+    } catch (error) {
+      toast({
+        title: "Sign In Failed",
+        description: "An error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDemoAccess = async () => {
+    const demoEmail = "demo@auditprop.com";
+    const demoPassword = "demo123";
+    setEmail(demoEmail);
+    setPassword(demoPassword);
+    setIsLoading(true);
+    
+    try {
+      await login(demoEmail, demoPassword);
+      toast({
+        title: "Demo Account",
+        description: "Demo user logged in. Redirecting to dashboard...",
+      });
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign in with demo account.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -89,6 +110,7 @@ export default function SignIn() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isLoading}
+                    data-testid="input-email"
                   />
                 </div>
 
@@ -96,7 +118,7 @@ export default function SignIn() {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
                     <Link href="/">
-                      <button className="text-xs text-primary hover:underline">
+                      <button className="text-xs text-primary hover:underline" data-testid="link-forgot-password">
                         Forgot password?
                       </button>
                     </Link>
@@ -108,10 +130,11 @@ export default function SignIn() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
+                    data-testid="input-password"
                   />
                 </div>
 
-                <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+                <Button type="submit" className="w-full gap-2" disabled={isLoading} data-testid="button-signin">
                   {isLoading ? "Signing In..." : "Sign In"} <ArrowRight className="h-4 w-4" />
                 </Button>
               </form>
@@ -129,6 +152,8 @@ export default function SignIn() {
                 variant="outline"
                 className="w-full mt-6"
                 onClick={handleDemoAccess}
+                disabled={isLoading}
+                data-testid="button-demo-access"
               >
                 Try Demo Account
               </Button>

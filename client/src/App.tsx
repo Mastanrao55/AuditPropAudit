@@ -16,6 +16,7 @@ import APIPage from "@/pages/api";
 import SignIn from "@/pages/sign-in";
 import AuditReports from "@/pages/audit-reports";
 import Settings from "@/pages/settings";
+import Contact from "@/pages/contact";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/api" component={APIPage} />
       <Route path="/sign-in" component={SignIn} />
+      <Route path="/contact" component={Contact} />
       <Route component={NotFound} />
     </Switch>
   );

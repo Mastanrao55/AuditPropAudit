@@ -52,6 +52,9 @@ export default function LandingPage() {
           <Link href="/api" className="hover:text-foreground transition-colors">
             API
           </Link>
+          <Link href="/news" className="hover:text-foreground transition-colors">
+            News
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild>

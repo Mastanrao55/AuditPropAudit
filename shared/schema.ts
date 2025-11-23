@@ -32,3 +32,14 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;
+
+export type NewsArticle = {
+  id: string;
+  title: string;
+  description: string;
+  source: string;
+  url: string;
+  imageUrl?: string;
+  publishedAt: string;
+  category: string;
+};

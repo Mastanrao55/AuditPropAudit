@@ -14,8 +14,16 @@ export const contactMessages = pgTable("contact_messages", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
+  company: text("company"),
+  jobTitle: text("job_title"),
+  companySize: text("company_size"),
+  industry: text("industry"),
   subject: text("subject").notNull(),
   message: text("message").notNull(),
+  budget: text("budget"),
+  timeline: text("timeline"),
+  interests: text("interests").array(),
+  hearAboutUs: text("hear_about_us"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -29,6 +37,14 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).om
   createdAt: true,
 }).extend({
   phone: z.string().optional(),
+  company: z.string().optional(),
+  jobTitle: z.string().optional(),
+  companySize: z.string().optional(),
+  industry: z.string().optional(),
+  budget: z.string().optional(),
+  timeline: z.string().optional(),
+  interests: z.array(z.string()).optional(),
+  hearAboutUs: z.string().optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

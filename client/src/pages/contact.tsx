@@ -5,21 +5,40 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Send, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    company: "",
+    jobTitle: "",
+    companySize: "",
+    industry: "",
     subject: "",
     message: "",
+    budget: "",
+    timeline: "",
+    interests: [] as string[],
+    hearAboutUs: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement & HTMLSelectElement;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      interests: checked
+        ? [...prev.interests, name]
+        : prev.interests.filter((item) => item !== name),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +55,7 @@ export default function Contact() {
       if (!response.ok) throw new Error("Failed to send message");
 
       setIsSuccess(true);
-      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", company: "", jobTitle: "", companySize: "", industry: "", subject: "", message: "", budget: "", timeline: "", interests: [], hearAboutUs: "" });
       toast.success("Message sent! We'll get back to you soon.");
 
       setTimeout(() => setIsSuccess(false), 5000);
@@ -102,84 +121,282 @@ export default function Contact() {
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-6">
-                      <div>
-                        <label htmlFor="name" className="block text-sm font-medium mb-2">
-                          Full Name
-                        </label>
-                        <Input
-                          id="name"
-                          name="name"
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="Your name"
-                          data-testid="input-name"
-                        />
+                      {/* Personal Info Section */}
+                      <div className="border-b pb-6">
+                        <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="name" className="block text-sm font-medium mb-2">
+                              Full Name *
+                            </label>
+                            <Input
+                              id="name"
+                              name="name"
+                              type="text"
+                              required
+                              value={formData.name}
+                              onChange={handleChange}
+                              placeholder="Your name"
+                              data-testid="input-name"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="email" className="block text-sm font-medium mb-2">
+                              Email Address *
+                            </label>
+                            <Input
+                              id="email"
+                              name="email"
+                              type="email"
+                              required
+                              value={formData.email}
+                              onChange={handleChange}
+                              placeholder="your.email@example.com"
+                              data-testid="input-email"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                              Phone Number
+                            </label>
+                            <Input
+                              id="phone"
+                              name="phone"
+                              type="tel"
+                              value={formData.phone}
+                              onChange={handleChange}
+                              placeholder="+1 (555) 123-4567"
+                              data-testid="input-phone"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="jobTitle" className="block text-sm font-medium mb-2">
+                              Job Title
+                            </label>
+                            <Input
+                              id="jobTitle"
+                              name="jobTitle"
+                              type="text"
+                              value={formData.jobTitle}
+                              onChange={handleChange}
+                              placeholder="e.g., Property Manager, CEO"
+                              data-testid="input-jobTitle"
+                            />
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium mb-2">
-                          Email Address
-                        </label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          required
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="your.email@example.com"
-                          data-testid="input-email"
-                        />
+                      {/* Company Info Section */}
+                      <div className="border-b pb-6">
+                        <h3 className="text-lg font-semibold mb-4">Company Information</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="company" className="block text-sm font-medium mb-2">
+                              Company Name
+                            </label>
+                            <Input
+                              id="company"
+                              name="company"
+                              type="text"
+                              value={formData.company}
+                              onChange={handleChange}
+                              placeholder="Your company name"
+                              data-testid="input-company"
+                            />
+                          </div>
+
+                          <div>
+                            <label htmlFor="industry" className="block text-sm font-medium mb-2">
+                              Industry
+                            </label>
+                            <select
+                              id="industry"
+                              name="industry"
+                              value={formData.industry}
+                              onChange={handleChange}
+                              data-testid="select-industry"
+                              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                            >
+                              <option value="">Select an industry</option>
+                              <option value="real-estate">Real Estate</option>
+                              <option value="banking">Banking & Finance</option>
+                              <option value="legal">Legal Services</option>
+                              <option value="government">Government</option>
+                              <option value="insurance">Insurance</option>
+                              <option value="investment">Investment</option>
+                              <option value="consulting">Consulting</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="companySize" className="block text-sm font-medium mb-2">
+                              Company Size
+                            </label>
+                            <select
+                              id="companySize"
+                              name="companySize"
+                              value={formData.companySize}
+                              onChange={handleChange}
+                              data-testid="select-companySize"
+                              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                            >
+                              <option value="">Select company size</option>
+                              <option value="1-10">1-10 employees</option>
+                              <option value="11-50">11-50 employees</option>
+                              <option value="51-200">51-200 employees</option>
+                              <option value="201-500">201-500 employees</option>
+                              <option value="501-1000">501-1000 employees</option>
+                              <option value="1000+">1000+ employees</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                          Phone Number <span className="text-muted-foreground text-xs">(Optional)</span>
-                        </label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+1 (555) 123-4567"
-                          data-testid="input-phone"
-                        />
+                      {/* Interest & Budget Section */}
+                      <div className="border-b pb-6">
+                        <h3 className="text-lg font-semibold mb-4">Project Details</h3>
+                        
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium mb-3">
+                            What are you interested in?
+                          </label>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {["Property Audits", "Due Diligence", "Fraud Detection", "Legal Review", "Financial Analysis", "Compliance Check"].map((interest) => (
+                              <label key={interest} className="flex items-center gap-2 cursor-pointer">
+                                <Checkbox
+                                  name={interest}
+                                  checked={formData.interests.includes(interest)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        interests: [...prev.interests, interest],
+                                      }));
+                                    } else {
+                                      setFormData((prev) => ({
+                                        ...prev,
+                                        interests: prev.interests.filter((item) => item !== interest),
+                                      }));
+                                    }
+                                  }}
+                                  data-testid={`checkbox-interest-${interest}`}
+                                />
+                                <span className="text-sm">{interest}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="budget" className="block text-sm font-medium mb-2">
+                              Budget Range
+                            </label>
+                            <select
+                              id="budget"
+                              name="budget"
+                              value={formData.budget}
+                              onChange={handleChange}
+                              data-testid="select-budget"
+                              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                            >
+                              <option value="">Select budget range</option>
+                              <option value="under-10k">Under $10,000</option>
+                              <option value="10k-50k">$10,000 - $50,000</option>
+                              <option value="50k-100k">$50,000 - $100,000</option>
+                              <option value="100k-500k">$100,000 - $500,000</option>
+                              <option value="500k+">$500,000+</option>
+                              <option value="not-sure">Not sure yet</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label htmlFor="timeline" className="block text-sm font-medium mb-2">
+                              Project Timeline
+                            </label>
+                            <select
+                              id="timeline"
+                              name="timeline"
+                              value={formData.timeline}
+                              onChange={handleChange}
+                              data-testid="select-timeline"
+                              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                            >
+                              <option value="">Select timeline</option>
+                              <option value="immediate">Immediate (This week)</option>
+                              <option value="1-month">Within 1 month</option>
+                              <option value="3-months">Within 3 months</option>
+                              <option value="6-months">Within 6 months</option>
+                              <option value="exploring">Still exploring options</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
-                      <div>
-                        <label htmlFor="subject" className="block text-sm font-medium mb-2">
-                          Subject
-                        </label>
-                        <Input
-                          id="subject"
-                          name="subject"
-                          type="text"
-                          required
-                          value={formData.subject}
-                          onChange={handleChange}
-                          placeholder="What is this about?"
-                          data-testid="input-subject"
-                        />
+                      {/* Message Section */}
+                      <div className="border-b pb-6">
+                        <h3 className="text-lg font-semibold mb-4">Your Message</h3>
+                        
+                        <div className="mb-4">
+                          <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                            Subject *
+                          </label>
+                          <Input
+                            id="subject"
+                            name="subject"
+                            type="text"
+                            required
+                            value={formData.subject}
+                            onChange={handleChange}
+                            placeholder="What is this about?"
+                            data-testid="input-subject"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="message" className="block text-sm font-medium mb-2">
+                            Message *
+                          </label>
+                          <textarea
+                            id="message"
+                            name="message"
+                            required
+                            value={formData.message}
+                            onChange={handleChange}
+                            placeholder="Tell us about your needs, specific properties, or any concerns..."
+                            rows={6}
+                            data-testid="textarea-message"
+                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          />
+                        </div>
                       </div>
 
+                      {/* How Did You Hear About Us */}
                       <div>
-                        <label htmlFor="message" className="block text-sm font-medium mb-2">
-                          Message
+                        <label htmlFor="hearAboutUs" className="block text-sm font-medium mb-2">
+                          How did you hear about us?
                         </label>
-                        <textarea
-                          id="message"
-                          name="message"
-                          required
-                          value={formData.message}
+                        <select
+                          id="hearAboutUs"
+                          name="hearAboutUs"
+                          value={formData.hearAboutUs}
                           onChange={handleChange}
-                          placeholder="Your message here..."
-                          rows={6}
-                          data-testid="textarea-message"
-                          className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        />
+                          data-testid="select-hearAboutUs"
+                          className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                        >
+                          <option value="">Select an option</option>
+                          <option value="search-engine">Search Engine</option>
+                          <option value="social-media">Social Media</option>
+                          <option value="referral">Referral</option>
+                          <option value="industry-event">Industry Event</option>
+                          <option value="news-article">News Article</option>
+                          <option value="advertisement">Advertisement</option>
+                          <option value="other">Other</option>
+                        </select>
                       </div>
 
                       <Button

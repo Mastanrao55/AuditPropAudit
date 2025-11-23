@@ -10,6 +10,7 @@ export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
     message: "",
   });
@@ -35,7 +36,7 @@ export default function Contact() {
       if (!response.ok) throw new Error("Failed to send message");
 
       setIsSuccess(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
       toast.success("Message sent! We'll get back to you soon.");
 
       setTimeout(() => setIsSuccess(false), 5000);
@@ -130,6 +131,21 @@ export default function Contact() {
                           onChange={handleChange}
                           placeholder="your.email@example.com"
                           data-testid="input-email"
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                          Phone Number <span className="text-muted-foreground text-xs">(Optional)</span>
+                        </label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          placeholder="+1 (555) 123-4567"
+                          data-testid="input-phone"
                         />
                       </div>
 

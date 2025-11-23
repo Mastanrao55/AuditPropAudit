@@ -19,6 +19,7 @@ import Settings from "@/pages/settings";
 import Contact from "@/pages/contact";
 import News from "@/pages/news";
 import AdminDashboard from "@/pages/admin";
+import AuditorDashboard from "@/pages/auditor";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/auditor" component={AuditorDashboard} />
       <Route path="/review" component={ReviewQueue} />
       <Route path="/reports" component={AuditReports} />
       <Route path="/settings" component={Settings} />

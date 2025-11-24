@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   Menu,
   Bell,
-  Shield
+  Shield,
+  BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -33,6 +34,7 @@ export function Layout({ children }: LayoutProps) {
     { name: "Review Queue", href: "/review", icon: AlertCircle },
     { name: "Audit Reports", href: "/reports", icon: FileText },
     { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
+    { name: "Market Intelligence", href: "/market", icon: BarChart3 },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
@@ -43,6 +45,7 @@ export function Layout({ children }: LayoutProps) {
         { name: "Review Queue", href: "/review", icon: AlertCircle },
         { name: "Audit Reports", href: "/reports", icon: FileText },
         { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
+        { name: "Market Intelligence", href: "/market", icon: BarChart3 },
         { name: "Settings", href: "/settings", icon: Settings },
       ]
     : baseNavigation;

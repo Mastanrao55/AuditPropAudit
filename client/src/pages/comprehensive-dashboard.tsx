@@ -18,6 +18,7 @@ import {
   DollarSign,
   ArrowRight,
   Gavel,
+  Landmark,
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -72,6 +73,14 @@ export default function ComprehensiveDashboard() {
       href: "/market",
       stats: "6 major cities analyzed",
       color: "bg-cyan-100 text-cyan-600",
+    },
+    {
+      name: "Title Verification",
+      description: "30-year title chain verification and ownership history",
+      icon: Landmark,
+      href: "/title",
+      stats: "30-year full verification",
+      color: "bg-blue-100 text-blue-600",
     },
     {
       name: "Fraud Detection",
@@ -150,6 +159,17 @@ export default function ComprehensiveDashboard() {
         "Rental Yield Computation",
         "Regulatory Change Tracking",
         "City Comparison Tools",
+      ],
+    },
+    {
+      category: "Title & Property Verification",
+      items: [
+        "30-year title chain verification",
+        "Ownership history tracking",
+        "Mortgage and encumbrance checks",
+        "Tax clearance verification",
+        "Litigation search integration",
+        "Risk score assessment",
       ],
     },
     {
@@ -339,6 +359,27 @@ export default function ComprehensiveDashboard() {
                     "Document Mgmt",
                   ].map((item, i) => (
                     <Badge key={i} variant="secondary" className="justify-start" data-testid={`badge-compliance-${i}`}>
+                      ✓ {item}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Title Verification */}
+              <div className="space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Landmark className="h-4 w-4" /> Title Verification
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {[
+                    "30-Year Chain",
+                    "Ownership History",
+                    "Mortgage Check",
+                    "Tax Clearance",
+                    "Risk Assessment",
+                    "Red Flag Detection",
+                  ].map((item, i) => (
+                    <Badge key={i} variant="secondary" className="justify-start" data-testid={`badge-title-${i}`}>
                       ✓ {item}
                     </Badge>
                   ))}

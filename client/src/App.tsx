@@ -25,6 +25,7 @@ import NRI from "@/pages/nri";
 import MarketIntelligence from "@/pages/market-intelligence";
 import FraudDetection from "@/pages/fraud-detection";
 import ComprehensiveDashboard from "@/pages/comprehensive-dashboard";
+import DocumentVerification from "@/pages/document-verification";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/nri" component={NRI} />
       <Route path="/market" component={MarketIntelligence} />
       <Route path="/fraud" component={FraudDetection} />
+      <Route path="/documents" component={DocumentVerification} />
       <Route path="/features" component={ComprehensiveDashboard} />
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/solutions" component={Solutions} />

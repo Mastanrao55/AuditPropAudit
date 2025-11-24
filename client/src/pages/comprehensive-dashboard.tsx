@@ -81,6 +81,14 @@ export default function ComprehensiveDashboard() {
       color: "bg-red-100 text-red-600",
     },
     {
+      name: "Document Verification",
+      description: "Upload documents for AI-powered verification and forgery detection",
+      icon: FileText,
+      href: "/documents",
+      stats: "AI OCR + Forgery Detection",
+      color: "bg-indigo-100 text-indigo-600",
+    },
+    {
       name: "Admin Panel",
       description: "System administration and user management",
       icon: Users,

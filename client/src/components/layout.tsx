@@ -12,7 +12,8 @@ import {
   Shield,
   BarChart3,
   Zap,
-  Layers
+  Layers,
+  Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -38,6 +39,7 @@ export function Layout({ children }: LayoutProps) {
     { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
     { name: "Market Intelligence", href: "/market", icon: BarChart3 },
     { name: "Fraud Detection", href: "/fraud", icon: Zap },
+    { name: "Document Verification", href: "/documents", icon: Upload },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
@@ -51,6 +53,7 @@ export function Layout({ children }: LayoutProps) {
         { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
         { name: "Market Intelligence", href: "/market", icon: BarChart3 },
         { name: "Fraud Detection", href: "/fraud", icon: Zap },
+        { name: "Document Verification", href: "/documents", icon: Upload },
         { name: "Settings", href: "/settings", icon: Settings },
       ]
     : baseNavigation;

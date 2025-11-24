@@ -13,11 +13,8 @@ const NEWS_SOURCES = [
 
 async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
   try {
-    // Using a free news aggregation approach with mock data
-    // In production, integrate with NewsAPI.org or similar service
     const articles: NewsArticle[] = [];
     
-    // Mock news data for demonstration
     const mockNews: Record<string, NewsArticle[]> = {
       "real estate": [
         {
@@ -27,15 +24,6 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
           source: "Real Estate Daily",
           url: "https://example.com/realestate1",
           publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Real Estate",
-        },
-        {
-          id: "2",
-          title: "New Regulations Reshape Property Investment Landscape",
-          description: "Government announces stricter transparency requirements for real estate transactions.",
-          source: "Property News Network",
-          url: "https://example.com/realestate2",
-          publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
           category: "Real Estate",
         },
       ],
@@ -49,61 +37,9 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
           publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
           category: "Legal",
         },
-        {
-          id: "4",
-          title: "New Property Registration Act Comes Into Force",
-          description: "Enhanced due diligence requirements now mandatory for all property transfers.",
-          source: "Judicial Review",
-          url: "https://example.com/legal2",
-          publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Legal",
-        },
-      ],
-      "finance": [
-        {
-          id: "5",
-          title: "Interest Rates Impact Property Financing Options",
-          description: "Central bank decision affects mortgage rates and real estate investment returns.",
-          source: "Financial Markets",
-          url: "https://example.com/finance1",
-          publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Finance",
-        },
-      ],
-      "banking": [
-        {
-          id: "6",
-          title: "Banks Tighten Mortgage Approval Standards",
-          description: "New compliance requirements lead to stricter property valuation procedures.",
-          source: "Banking Digest",
-          url: "https://example.com/banking1",
-          publishedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Banking",
-        },
-      ],
-      "fraud": [
-        {
-          id: "7",
-          title: "Document Forgery Ring Dismantled in Major Investigation",
-          description: "Law enforcement uncovers fraudulent property title scheme affecting hundreds.",
-          source: "Crime Watch",
-          url: "https://example.com/fraud1",
-          publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Fraud",
-        },
-        {
-          id: "8",
-          title: "New Technology Combats Property Document Fraud",
-          description: "Blockchain-based verification system helps identify forged land records.",
-          source: "Tech & Crime",
-          url: "https://example.com/fraud2",
-          publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Fraud",
-        },
       ],
     };
 
-    // Return all mock news or filtered by query
     const lowerQuery = query.toLowerCase();
     for (const [key, newsList] of Object.entries(mockNews)) {
       if (!query || lowerQuery.includes(key)) {
@@ -121,12 +57,7 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
-
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
-
+  // Contact endpoint
   app.post("/api/contact", async (req, res) => {
     try {
       const validatedData = insertContactMessageSchema.parse(req.body);
@@ -137,6 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // News endpoint
   app.get("/api/news", async (req, res) => {
     try {
       const category = req.query.category as string || "";
@@ -147,7 +79,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+  // Feature 1 & 5: Encumbrance Certificate endpoints
+  app.get("/api/ec/:propertyId", async (req, res) => {
+    try {
+      const ec = await storage.getEncumbranceCertificate(req.params.propertyId);
+      if (!ec) {
+        return res.status(404).json({ error: "EC not found" });
+      }
+      res.json(ec);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch EC" });
+    }
+  });
 
+  app.get("/api/ec/state/:state", async (req, res) => {
+    try {
+      const ecs = await storage.listEncumbranceCertificates(req.params.state);
+      res.json(ecs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch ECs" });
+    }
+  });
+
+  // Feature 2: RERA Status Checker endpoints
+  app.get("/api/rera/:registrationNumber", async (req, res) => {
+    try {
+      const project = await storage.getReraProject(req.params.registrationNumber);
+      if (!project) {
+        return res.status(404).json({ error: "RERA project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch RERA project" });
+    }
+  });
+
+  app.get("/api/rera/state/:state", async (req, res) => {
+    try {
+      const city = req.query.city as string;
+      const projects = await storage.listReraProjects(req.params.state, city);
+      res.json(projects);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch RERA projects" });
+    }
+  });
+
+  // Feature 3: Litigation Search Aggregator endpoints
+  app.get("/api/litigation/case/:caseNumber", async (req, res) => {
+    try {
+      const litigationCase = await storage.getLitigationCase(req.params.caseNumber);
+      if (!litigationCase) {
+        return res.status(404).json({ error: "Case not found" });
+      }
+      res.json(litigationCase);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch litigation case" });
+    }
+  });
+
+  app.get("/api/litigation/property", async (req, res) => {
+    try {
+      const address = req.query.address as string;
+      if (!address) {
+        return res.status(400).json({ error: "Property address required" });
+      }
+      const cases = await storage.listLitigationCasesByProperty(address);
+      res.json(cases);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch litigation cases" });
+    }
+  });
+
+  // Feature 4 & 10: NRI Document Checklist endpoints
+  app.get("/api/nri/checklist/:email", async (req, res) => {
+    try {
+      const checklist = await storage.getNRIChecklist(req.params.email);
+      if (!checklist) {
+        return res.status(404).json({ error: "Checklist not found" });
+      }
+      res.json(checklist);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch NRI checklist" });
+    }
+  });
+
+  app.post("/api/nri/checklist", async (req, res) => {
+    try {
+      const checklist = await storage.createNRIChecklist(req.body);
+      res.json(checklist);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create NRI checklist" });
+    }
+  });
+
+  // Feature 6: Title Verification endpoints
+  app.get("/api/title/:propertyId", async (req, res) => {
+    try {
+      const titleVerification = await storage.getTitleVerification(req.params.propertyId);
+      if (!titleVerification) {
+        return res.status(404).json({ error: "Title verification not found" });
+      }
+      res.json(titleVerification);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch title verification" });
+    }
+  });
+
+  // Feature 7: Fraud Detection endpoints
+  app.get("/api/fraud/:propertyId", async (req, res) => {
+    try {
+      const fraudScore = await storage.getFraudScore(req.params.propertyId);
+      if (!fraudScore) {
+        return res.status(404).json({ error: "Fraud score not found" });
+      }
+      res.json(fraudScore);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch fraud score" });
+    }
+  });
+
+  // Feature 8: Developer Audit endpoints
+  app.get("/api/developer/audit/:developerId/:year", async (req, res) => {
+    try {
+      const audit = await storage.getDeveloperAudit(
+        req.params.developerId,
+        parseInt(req.params.year)
+      );
+      if (!audit) {
+        return res.status(404).json({ error: "Audit not found" });
+      }
+      res.json(audit);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch developer audit" });
+    }
+  });
+
+  app.get("/api/developer/:developerId", async (req, res) => {
+    try {
+      const audits = await storage.listDeveloperAudits(req.params.developerId);
+      res.json(audits);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch developer audits" });
+    }
+  });
+
+  // Feature 9: Document Verification endpoints
+  app.get("/api/documents/:id", async (req, res) => {
+    try {
+      const doc = await storage.getDocumentVerification(req.params.id);
+      if (!doc) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+      res.json(doc);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch document" });
+    }
+  });
+
+  app.get("/api/documents/type/:documentType", async (req, res) => {
+    try {
+      const docs = await storage.listDocumentVerifications(req.params.documentType);
+      res.json(docs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch documents" });
+    }
+  });
+
+  // Feature 11: Land Records endpoints
+  app.get("/api/land/:propertyId", async (req, res) => {
+    try {
+      const landRecord = await storage.getLandRecord(req.params.propertyId);
+      if (!landRecord) {
+        return res.status(404).json({ error: "Land record not found" });
+      }
+      res.json(landRecord);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch land record" });
+    }
+  });
+
+  app.get("/api/land/location/:state/:district", async (req, res) => {
+    try {
+      const records = await storage.listLandRecordsByLocation(
+        req.params.state,
+        req.params.district
+      );
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch land records" });
+    }
+  });
+
+  // Feature 12: Market Intelligence endpoints
+  app.get("/api/market/:city/:monthYear", async (req, res) => {
+    try {
+      const intelligence = await storage.getMarketIntelligence(
+        req.params.city,
+        req.params.monthYear
+      );
+      if (!intelligence) {
+        return res.status(404).json({ error: "Market intelligence not found" });
+      }
+      res.json(intelligence);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch market intelligence" });
+    }
+  });
+
+  app.get("/api/market/city/:city", async (req, res) => {
+    try {
+      const records = await storage.listMarketIntelligenceByCity(req.params.city);
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch market records" });
+    }
+  });
+
+  const httpServer = createServer(app);
   return httpServer;
 }

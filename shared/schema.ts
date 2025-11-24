@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, decimal, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, numeric, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -64,7 +64,7 @@ export const reraProjects = pgTable("rera_projects", {
   delayMonths: integer("delay_months").default(0),
   amenities: text("amenities").array(),
   approvalNumber: text("approval_number"),
-  sanctionedArea: decimal("sanctioned_area", 10, 2),
+  sanctionedArea: numeric("sanctioned_area", { precision: 10, scale: 2 }),
   unitsDelivered: integer("units_delivered").default(0),
   buyerComplaints: integer("buyer_complaints").default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -120,7 +120,7 @@ export const titleVerifications = pgTable("title_verifications", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyId: varchar("property_id").notNull(),
   ownerName: text("owner_name").notNull(),
-  currentSalePrice: decimal("current_sale_price", 15, 2),
+  currentSalePrice: numeric("current_sale_price", { precision: 15, scale: 2 }),
   verificationStatus: text("verification_status").notNull(), // clean, flagged, disputed, unclear
   titleChainComplete: boolean("title_chain_complete").default(false),
   yearsVerified: integer("years_verified").default(0),
@@ -200,8 +200,8 @@ export const landRecords = pgTable("land_records", {
   surveyNumber: text("survey_number"),
   plotNumber: text("plot_number"),
   pattaNumber: text("patta_number"),
-  areaInSqft: decimal("area_in_sqft", 10, 2),
-  areaInAcres: decimal("area_in_acres", 8, 2),
+  areaInSqft: numeric("area_in_sqft", { precision: 10, scale: 2 }),
+  areaInAcres: numeric("area_in_acres", { precision: 8, scale: 2 }),
   landType: text("land_type"), // agricultural, non_agricultural, residential, commercial
   recordStatus: text("record_status").default("verified"), // verified, unverified, disputed
   ownerName: text("owner_name").notNull(),
@@ -221,15 +221,15 @@ export const marketIntelligence = pgTable("market_intelligence", {
   state: text("state").notNull(),
   locality: text("locality"),
   monthYear: text("month_year").notNull(), // YYYY-MM format
-  avgPropertyPrice: decimal("avg_property_price", 15, 2),
-  pricePerSqft: decimal("price_per_sqft", 10, 2),
+  avgPropertyPrice: numeric("avg_property_price", { precision: 15, scale: 2 }),
+  pricePerSqft: numeric("price_per_sqft", { precision: 10, scale: 2 }),
   transactionVolume: integer("transaction_volume").default(0),
-  frauldRatePercentage: decimal("fraud_rate_percentage", 5, 2),
-  developerDefaultRate: decimal("developer_default_rate", 5, 2),
-  projectStallRate: decimal("project_stall_rate", 5, 2),
+  frauldRatePercentage: numeric("fraud_rate_percentage", { precision: 5, scale: 2 }),
+  developerDefaultRate: numeric("developer_default_rate", { precision: 5, scale: 2 }),
+  projectStallRate: numeric("project_stall_rate", { precision: 5, scale: 2 }),
   avgProjectDelayMonths: integer("avg_project_delay_months").default(0),
-  demandSupplyRatio: decimal("demand_supply_ratio", 5, 2),
-  rentYield: decimal("rent_yield", 5, 2),
+  demandSupplyRatio: numeric("demand_supply_ratio", { precision: 5, scale: 2 }),
+  rentYield: numeric("rent_yield", { precision: 5, scale: 2 }),
   investmentScore: integer("investment_score").default(0), // 0-100
   regulatoryChanges: text("regulatory_changes").array(),
   createdAt: timestamp("created_at").defaultNow(),

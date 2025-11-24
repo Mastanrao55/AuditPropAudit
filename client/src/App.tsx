@@ -20,6 +20,7 @@ import Contact from "@/pages/contact";
 import News from "@/pages/news";
 import AdminDashboard from "@/pages/admin";
 import AuditorDashboard from "@/pages/auditor";
+import VerificationHub from "@/pages/verification-hub";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/auditor" component={AuditorDashboard} />
+      <Route path="/verification" component={VerificationHub} />
       <Route path="/review" component={ReviewQueue} />
       <Route path="/reports" component={AuditReports} />
       <Route path="/settings" component={Settings} />

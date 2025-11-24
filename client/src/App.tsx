@@ -21,6 +21,7 @@ import News from "@/pages/news";
 import AdminDashboard from "@/pages/admin";
 import AuditorDashboard from "@/pages/auditor";
 import VerificationHub from "@/pages/verification-hub";
+import NRI from "@/pages/nri";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/review" component={ReviewQueue} />
       <Route path="/reports" component={AuditReports} />
       <Route path="/settings" component={Settings} />
+      <Route path="/nri" component={NRI} />
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/solutions" component={Solutions} />
       <Route path="/data-sources" component={DataSources} />

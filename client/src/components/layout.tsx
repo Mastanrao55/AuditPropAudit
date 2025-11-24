@@ -32,6 +32,7 @@ export function Layout({ children }: LayoutProps) {
     { name: "Property Search", href: "/dashboard", icon: Search },
     { name: "Review Queue", href: "/review", icon: AlertCircle },
     { name: "Audit Reports", href: "/reports", icon: FileText },
+    { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
     { name: "Settings", href: "/settings", icon: Settings },
   ];
 
@@ -41,6 +42,7 @@ export function Layout({ children }: LayoutProps) {
         { name: "Admin Panel", href: "/admin", icon: Shield },
         { name: "Review Queue", href: "/review", icon: AlertCircle },
         { name: "Audit Reports", href: "/reports", icon: FileText },
+        { name: "NRI Suite", href: "/nri", icon: ShieldCheck },
         { name: "Settings", href: "/settings", icon: Settings },
       ]
     : baseNavigation;

@@ -17,7 +17,8 @@ import {
   Gavel,
   Landmark,
   Building2,
-  Home
+  Home,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -42,6 +43,7 @@ export function Layout({ children }: LayoutProps) {
     { name: "Audit Reports", href: "/reports", icon: FileText },
     { name: "RERA Dashboard", href: "/rera", icon: Building2 },
     { name: "EC Dashboard", href: "/ec", icon: Home },
+    { name: "Property Valuation", href: "/valuation", icon: TrendingUp },
     { name: "Developer Audits", href: "/developer-audit", icon: Building2 },
     { name: "Title Verification", href: "/title", icon: Landmark },
     { name: "Litigation Search", href: "/litigation", icon: Gavel },
@@ -61,6 +63,7 @@ export function Layout({ children }: LayoutProps) {
         { name: "Audit Reports", href: "/reports", icon: FileText },
         { name: "RERA Dashboard", href: "/rera", icon: Building2 },
         { name: "EC Dashboard", href: "/ec", icon: Home },
+        { name: "Property Valuation", href: "/valuation", icon: TrendingUp },
         { name: "Developer Audits", href: "/developer-audit", icon: Building2 },
         { name: "Title Verification", href: "/title", icon: Landmark },
         { name: "Litigation Search", href: "/litigation", icon: Gavel },

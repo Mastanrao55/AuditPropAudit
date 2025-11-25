@@ -32,6 +32,7 @@ import DeveloperAuditDashboard from "@/pages/developer-audit-dashboard";
 import NRISolutions from "@/pages/nri-solutions";
 import RERADashboard from "@/pages/rera-dashboard";
 import ECDashboard from "@/pages/ec-dashboard";
+import PropertyValuation from "@/pages/property-valuation";
 
 function Router() {
   return (
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/developer-audit" component={DeveloperAuditDashboard} />
       <Route path="/rera" component={RERADashboard} />
       <Route path="/ec" component={ECDashboard} />
+      <Route path="/valuation" component={PropertyValuation} />
       <Route path="/features" component={ComprehensiveDashboard} />
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/solutions" component={Solutions} />

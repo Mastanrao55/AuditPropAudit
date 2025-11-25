@@ -31,6 +31,7 @@ import TitleVerification from "@/pages/title-verification";
 import DeveloperAuditDashboard from "@/pages/developer-audit-dashboard";
 import NRISolutions from "@/pages/nri-solutions";
 import RERADashboard from "@/pages/rera-dashboard";
+import ECDashboard from "@/pages/ec-dashboard";
 
 function Router() {
   return (
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/title" component={TitleVerification} />
       <Route path="/developer-audit" component={DeveloperAuditDashboard} />
       <Route path="/rera" component={RERADashboard} />
+      <Route path="/ec" component={ECDashboard} />
       <Route path="/features" component={ComprehensiveDashboard} />
       <Route path="/property/:id" component={PropertyDetails} />
       <Route path="/solutions" component={Solutions} />

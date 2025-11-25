@@ -15,7 +15,8 @@ import {
   Layers,
   Upload,
   Gavel,
-  Landmark
+  Landmark,
+  Building2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -55,6 +56,7 @@ export function Layout({ children }: LayoutProps) {
         { name: "Admin Panel", href: "/admin", icon: Shield },
         { name: "Review Queue", href: "/review", icon: AlertCircle },
         { name: "Audit Reports", href: "/reports", icon: FileText },
+        { name: "Developer Audits", href: "/developer-audit", icon: Building2 },
         { name: "Title Verification", href: "/title", icon: Landmark },
         { name: "Litigation Search", href: "/litigation", icon: Gavel },
         { name: "NRI Suite", href: "/nri", icon: ShieldCheck },

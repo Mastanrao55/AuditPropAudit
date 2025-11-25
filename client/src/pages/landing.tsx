@@ -46,12 +46,6 @@ export default function LandingPage() {
           <Link href="/nri-solutions" className="hover:text-foreground transition-colors" data-testid="link-nri-solutions">
             NRI Solutions
           </Link>
-          <Link href="/rera" className="hover:text-foreground transition-colors" data-testid="link-rera">
-            RERA Verification
-          </Link>
-          <Link href="/ec" className="hover:text-foreground transition-colors" data-testid="link-ec">
-            EC Verification
-          </Link>
           <Link href="/data-sources" className="hover:text-foreground transition-colors" data-testid="link-data-sources">
             Data Sources
           </Link>

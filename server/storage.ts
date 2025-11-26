@@ -70,6 +70,9 @@ export class MemStorage implements IStorage {
   private documentVerifications: Map<string, DocumentVerification>;
   private landRecords: Map<string, LandRecord>;
   private marketIntelligence: Map<string, MarketIntelligence>;
+  private userCreditsMap: Map<string, UserCredit>;
+  private userPropertiesMap: Map<string, UserProperty>;
+  private propertyArchiveMap: Map<string, PropertyArchiveEntry>;
 
   constructor() {
     this.users = new Map();
@@ -84,6 +87,9 @@ export class MemStorage implements IStorage {
     this.documentVerifications = new Map();
     this.landRecords = new Map();
     this.marketIntelligence = new Map();
+    this.userCreditsMap = new Map();
+    this.userPropertiesMap = new Map();
+    this.propertyArchiveMap = new Map();
     this.initializeMockData();
   }
 
@@ -333,6 +339,86 @@ export class MemStorage implements IStorage {
     return Array.from(this.marketIntelligence.values()).filter(
       m => m.city === city
     );
+  }
+
+  // User Credits & Properties methods
+  async getUserCredits(userId: string): Promise<UserCredit | undefined> {
+    return Array.from(this.userCreditsMap.values()).find(c => c.userId === userId);
+  }
+
+  async createUserCredits(userId: string): Promise<UserCredit> {
+    const existing = await this.getUserCredits(userId);
+    if (existing) return existing;
+    
+    const credit: UserCredit = {
+      id: randomUUID(),
+      userId,
+      totalCredits: 100,
+      usedCredits: 0,
+      creditsPerProperty: 1,
+      updatedAt: new Date(),
+    };
+    this.userCreditsMap.set(credit.id, credit);
+    return credit;
+  }
+
+  async addUserProperty(property: InsertUserProperty): Promise<UserProperty> {
+    const userProp: UserProperty = {
+      id: randomUUID(),
+      ...property,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.userPropertiesMap.set(userProp.id, userProp);
+    return userProp;
+  }
+
+  async getUserProperties(userId: string, status?: string): Promise<UserProperty[]> {
+    const props = Array.from(this.userPropertiesMap.values()).filter(
+      p => p.userId === userId
+    );
+    return status ? props.filter(p => p.status === status) : props;
+  }
+
+  async updateUserPropertyStatus(propertyId: string, status: string): Promise<UserProperty | undefined> {
+    const prop = Array.from(this.userPropertiesMap.values()).find(p => p.id === propertyId);
+    if (prop) {
+      prop.status = status;
+      prop.updatedAt = new Date();
+    }
+    return prop;
+  }
+
+  async archiveSearchedProperty(userId: string, propertyId: string, propertyDetails: any, notes?: string): Promise<PropertyArchiveEntry> {
+    const archive: PropertyArchiveEntry = {
+      id: randomUUID(),
+      userId,
+      propertyId,
+      propertyDetails,
+      searchedAt: new Date(),
+      notes: notes || "",
+      rating: undefined,
+    };
+    this.propertyArchiveMap.set(archive.id, archive);
+    return archive;
+  }
+
+  async getPropertyArchive(userId: string): Promise<PropertyArchiveEntry[]> {
+    return Array.from(this.propertyArchiveMap.values()).filter(
+      a => a.userId === userId
+    );
+  }
+
+  async deductCredits(userId: string, amount: number): Promise<UserCredit | undefined> {
+    const credit = await this.getUserCredits(userId);
+    if (credit) {
+      const available = credit.totalCredits - credit.usedCredits;
+      if (available >= amount) {
+        credit.usedCredits += amount;
+        credit.updatedAt = new Date();
+      }
+    }
+    return credit;
   }
 }
 

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertUserSchema, type NewsArticle } from "@shared/schema";
+import { insertContactMessageSchema, insertUserSchema, insertUserPropertySchema, type NewsArticle } from "@shared/schema";
 import { ZodError } from "zod";
 
 const NEWS_SOURCES = [
@@ -297,6 +297,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(records);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch market records" });
+    }
+  });
+
+  // Property Management endpoints
+  app.get("/api/user-credits/:userId", async (req, res) => {
+    try {
+      let credits = await storage.getUserCredits(req.params.userId);
+      if (!credits) {
+        credits = await storage.createUserCredits(req.params.userId);
+      }
+      res.json(credits);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch credits" });
+    }
+  });
+
+  app.post("/api/user-properties", async (req, res) => {
+    try {
+      const validated = insertUserPropertySchema.parse(req.body);
+      const credits = await storage.getUserCredits(validated.userId);
+      if (!credits) {
+        return res.status(400).json({ error: "User has no credits" });
+      }
+      const available = credits.totalCredits - credits.usedCredits;
+      if (available < credits.creditsPerProperty) {
+        return res.status(400).json({ error: "Insufficient credits" });
+      }
+      
+      const property = await storage.addUserProperty(validated);
+      await storage.deductCredits(validated.userId, credits.creditsPerProperty);
+      res.json(property);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: "Invalid property data", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to add property" });
+      }
+    }
+  });
+
+  app.get("/api/user-properties/:userId", async (req, res) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const properties = await storage.getUserProperties(req.params.userId, status);
+      res.json(properties);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch properties" });
+    }
+  });
+
+  app.patch("/api/user-properties/:propertyId", async (req, res) => {
+    try {
+      const { status } = req.body;
+      const property = await storage.updateUserPropertyStatus(req.params.propertyId, status);
+      if (!property) {
+        return res.status(404).json({ error: "Property not found" });
+      }
+      res.json(property);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update property" });
+    }
+  });
+
+  app.post("/api/property-archive", async (req, res) => {
+    try {
+      const { userId, propertyId, propertyDetails, notes } = req.body;
+      const archive = await storage.archiveSearchedProperty(userId, propertyId, propertyDetails, notes);
+      res.json(archive);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to archive property" });
+    }
+  });
+
+  app.get("/api/property-archive/:userId", async (req, res) => {
+    try {
+      const archives = await storage.getPropertyArchive(req.params.userId);
+      res.json(archives);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch archived properties" });
     }
   });
 

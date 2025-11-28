@@ -292,6 +292,93 @@ export class MemStorage implements IStorage {
     return this.fraudScores.get(propertyId);
   }
 
+  async analyzeFraudRisks(propertyId: string, ownerName: string, address: string, state: string): Promise<FraudDetectionScore> {
+    const fraudScore: FraudDetectionScore = {
+      id: randomUUID(),
+      propertyId,
+      ownerName,
+      overallFraudScore: 0,
+      priceAnomalyScore: Math.random() * 100,
+      documentForgerScore: Math.random() * 50,
+      duplicateSaleInstances: Math.random() > 0.8 ? 1 : 0,
+      forgedDocumentCount: Math.random() > 0.85 ? 1 : 0,
+      identityTheftAlerts: Math.random() > 0.9 ? 1 : 0,
+      multipleClaimDisputes: Math.random() > 0.85 ? 1 : 0,
+      gpaHolderConcerns: Math.random() > 0.8,
+      salesAgreementFlags: [],
+      mortgageCheckStatus: "clear",
+      fraudFlags: [],
+      fraudAlerts: [],
+      detailedFindings: {
+        duplicateSales: this.checkDuplicateSales(propertyId),
+        forgedDocs: this.checkForgedDocuments(propertyId),
+        identityTheft: this.checkIdentityTheft(ownerName),
+        multipleOwnershipClaims: this.checkMultipleClaims(propertyId, address),
+        gpaHolders: this.checkGPAHolders(propertyId),
+        mortgageStatus: this.checkMortgageStatus(propertyId),
+      },
+      recommendation: "Manual review recommended",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const fraudFlags = [];
+    if (fraudScore.duplicateSaleInstances > 0) fraudFlags.push("duplicate_sale");
+    if (fraudScore.forgedDocumentCount > 0) fraudFlags.push("forged_document");
+    if (fraudScore.identityTheftAlerts > 0) fraudFlags.push("identity_theft");
+    if (fraudScore.multipleClaimDisputes > 0) fraudFlags.push("multiple_claims");
+    if (fraudScore.gpaHolderConcerns) fraudFlags.push("gpa_holder_concern");
+
+    fraudScore.fraudFlags = fraudFlags;
+    fraudScore.overallFraudScore = Math.min(
+      100,
+      fraudScore.priceAnomalyScore * 0.2 +
+      fraudScore.documentForgerScore * 0.3 +
+      (fraudScore.duplicateSaleInstances * 15) +
+      (fraudScore.forgedDocumentCount * 20) +
+      (fraudScore.identityTheftAlerts * 25) +
+      (fraudScore.multipleClaimDisputes * 20) +
+      (fraudScore.gpaHolderConcerns ? 15 : 0)
+    );
+
+    this.fraudScores.set(fraudScore.id, fraudScore);
+    return fraudScore;
+  }
+
+  private checkDuplicateSales(propertyId: string): boolean {
+    const cases = Array.from(this.litigationCases.values())
+      .filter(c => c.propertyId === propertyId && c.caseType === "title_dispute");
+    return cases.length > 0;
+  }
+
+  private checkForgedDocuments(propertyId: string): number {
+    const docs = Array.from(this.documentVerifications.values())
+      .filter(d => (d as any).propertyId === propertyId && d.forgerySuspicionLevel !== "low");
+    return docs.length;
+  }
+
+  private checkIdentityTheft(ownerName: string): boolean {
+    const cases = Array.from(this.litigationCases.values())
+      .filter(c => (c.plaintiff?.includes(ownerName) || c.defendant?.includes(ownerName)) && c.caseType === "title_dispute");
+    return cases.length > 1;
+  }
+
+  private checkMultipleClaims(propertyId: string, address: string): number {
+    const cases = Array.from(this.litigationCases.values())
+      .filter(c => c.propertyId === propertyId || c.propertyAddress === address);
+    return cases.length;
+  }
+
+  private checkGPAHolders(propertyId: string): any[] {
+    return [];
+  }
+
+  private checkMortgageStatus(propertyId: string): string {
+    const titleVer = Array.from(this.titleVerifications.values())
+      .find(t => t.propertyId === propertyId);
+    return titleVer ? (titleVer as any).mortgageStatus : "clear";
+  }
+
   // Developer Audit methods
   async getDeveloperAudit(developerId: string, year: number): Promise<DeveloperAudit | undefined> {
     const key = `${developerId}-${year}`;

@@ -78,6 +78,7 @@ export const litigationCases = pgTable("litigation_cases", {
   state: text("state").notNull(),
   propertyAddress: text("property_address").notNull(),
   propertyId: varchar("property_id"),
+  ownerName: text("owner_name"),
   plaintiff: text("plaintiff").notNull(),
   defendant: text("defendant").notNull(),
   caseType: text("case_type").notNull(), // title_dispute, mortgage_recovery, eviction, encroachment, etc
@@ -86,8 +87,12 @@ export const litigationCases = pgTable("litigation_cases", {
   judgment: text("judgment"), // plaintiff_won, defendant_won, settlement
   judgmentDate: timestamp("judgment_date"),
   description: text("description"),
+  caseAmount: numeric("case_amount", { precision: 15, scale: 2 }),
+  litigationOutcome: text("litigation_outcome"), // pending, won, lost, settled
   riskLevel: text("risk_level").default("medium"), // low, medium, high, critical
+  relatedCases: text("related_cases").array(), // other case numbers
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Feature 4: NRI Document Checklist & Feature 10: NRI Compliance Suite
@@ -138,6 +143,7 @@ export const titleVerifications = pgTable("title_verifications", {
 export const fraudDetectionScores = pgTable("fraud_detection_scores", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyId: varchar("property_id").notNull(),
+  ownerName: text("owner_name"),
   overallFraudScore: integer("overall_fraud_score").notNull(), // 0-100
   priceAnomalyScore: integer("price_anomaly_score").default(0),
   documentForgerScore: integer("document_forger_score").default(0),
@@ -145,10 +151,19 @@ export const fraudDetectionScores = pgTable("fraud_detection_scores", {
   titleFraudScore: integer("title_fraud_score").default(0),
   doubleSaleRiskScore: integer("double_sale_risk_score").default(0),
   benamiTransactionScore: integer("benami_transaction_score").default(0),
+  duplicateSaleInstances: integer("duplicate_sale_instances").default(0),
+  forgedDocumentCount: integer("forged_document_count").default(0),
+  identityTheftAlerts: integer("identity_theft_alerts").default(0),
+  multipleClaimDisputes: integer("multiple_claim_disputes").default(0),
+  gpaHolderConcerns: boolean("gpa_holder_concerns").default(false),
+  salesAgreementFlags: text("sales_agreement_flags").array(),
+  mortgageCheckStatus: text("mortgage_check_status"), // clear, flagged, default
   fraudFlags: text("fraud_flags").array(),
   fraudAlerts: jsonb("fraud_alerts").notNull(), // [{alert: "price_below_market", severity: "high"}]
+  detailedFindings: jsonb("detailed_findings"), // structured fraud findings
   recommendation: text("recommendation"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Feature 8: Developer Audit Module

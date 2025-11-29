@@ -214,6 +214,7 @@ export default function LitigationSearch() {
     if (status === "appealed") return "bg-orange-100 text-orange-700";
     return "bg-emerald-100 text-emerald-700";
   };
+  // Note: These local implementations are kept for page-specific styling. Shared utils available in @/lib/utils
 
   const getCaseStats = () => {
     return {

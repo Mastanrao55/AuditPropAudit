@@ -60,14 +60,8 @@ export interface Property {
   lastAudited: string;
 }
 
-// Helper to format currency
-export const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(amount);
-};
+// Re-export formatCurrency from utils to avoid duplicates
+export { formatCurrency } from "@/lib/utils";
 
 // Mock Data
 import stockImage1 from "@assets/stock_images/modern_office_buildi_fceaff61.jpg";

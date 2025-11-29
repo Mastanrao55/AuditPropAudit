@@ -1,7 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertUserSchema, insertUserPropertySchema, type NewsArticle } from "@shared/schema";
+import { 
+  insertContactMessageSchema, 
+  insertUserSchema, 
+  insertUserPropertySchema, 
+  insertNRIChecklistSchema,
+  insertPropertyArchiveSchema,
+  type NewsArticle 
+} from "@shared/schema";
 import { ZodError } from "zod";
 
 const NEWS_SOURCES = [
@@ -166,7 +173,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/nri/checklist", async (req, res) => {
     try {
-      const checklist = await storage.createNRIChecklist(req.body);
+      const validated = insertNRIChecklistSchema.parse(req.body);
+      const checklist = await storage.createNRIChecklist(validated);
       res.json(checklist);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -362,11 +370,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/property-archive", async (req, res) => {
     try {
-      const { userId, propertyId, propertyDetails, notes } = req.body;
-      const archive = await storage.archiveSearchedProperty(userId, propertyId, propertyDetails, notes);
+      const validated = insertPropertyArchiveSchema.parse(req.body);
+      const archive = await storage.archiveSearchedProperty(
+        validated.userId, 
+        validated.propertyId, 
+        validated.propertyDetails,
+        validated.notes ?? undefined
+      );
       res.json(archive);
     } catch (error) {
-      res.status(500).json({ error: "Failed to archive property" });
+      if (error instanceof ZodError) {
+        res.status(400).json({ error: "Invalid archive data", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to archive property" });
+      }
     }
   });
 

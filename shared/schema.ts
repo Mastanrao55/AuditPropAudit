@@ -350,3 +350,35 @@ export const insertUserPropertySchema = createInsertSchema(userProperties).omit(
 });
 
 export type InsertUserProperty = z.infer<typeof insertUserPropertySchema>;
+
+// NRI Checklist validation schema
+export const insertNRIChecklistSchema = createInsertSchema(nriDocumentChecklists).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertNRIChecklist = z.infer<typeof insertNRIChecklistSchema>;
+
+// Property Archive validation schema
+export const insertPropertyArchiveSchema = createInsertSchema(propertyArchive).omit({
+  id: true,
+  searchedAt: true,
+});
+
+export type InsertPropertyArchive = z.infer<typeof insertPropertyArchiveSchema>;
+
+// Property Details type for archiving (replacing any)
+export interface PropertyDetails {
+  title?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  type?: string;
+  marketValue?: number;
+  riskScore?: number;
+  riskLevel?: string;
+  owners?: Array<{ name: string; type?: string }>;
+  [key: string]: unknown;
+}

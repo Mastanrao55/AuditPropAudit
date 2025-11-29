@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type ContactMessage, type InsertContactMessage, type EncumbranceCertificate, type ReraProject, type LitigationCase, type NRIDocumentChecklist, type TitleVerification, type FraudDetectionScore, type DeveloperAudit, type DocumentVerification, type LandRecord, type MarketIntelligence, type UserCredit, type UserProperty, type PropertyArchiveEntry, type InsertUserProperty } from "@shared/schema";
+import { type User, type InsertUser, type ContactMessage, type InsertContactMessage, type EncumbranceCertificate, type ReraProject, type LitigationCase, type NRIDocumentChecklist, type TitleVerification, type FraudDetectionScore, type DeveloperAudit, type DocumentVerification, type LandRecord, type MarketIntelligence, type UserCredit, type UserProperty, type PropertyArchiveEntry, type InsertUserProperty, type PropertyDetails, type InsertNRIChecklist } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -22,7 +22,7 @@ export interface IStorage {
   
   // NRI Document Checklist methods
   getNRIChecklist(nriEmail: string): Promise<NRIDocumentChecklist | undefined>;
-  createNRIChecklist(checklist: Partial<NRIDocumentChecklist>): Promise<NRIDocumentChecklist>;
+  createNRIChecklist(checklist: InsertNRIChecklist): Promise<NRIDocumentChecklist>;
   
   // Title Verification methods
   getTitleVerification(propertyId: string): Promise<TitleVerification | undefined>;
@@ -52,7 +52,7 @@ export interface IStorage {
   addUserProperty(property: InsertUserProperty): Promise<UserProperty>;
   getUserProperties(userId: string, status?: string): Promise<UserProperty[]>;
   updateUserPropertyStatus(propertyId: string, status: string): Promise<UserProperty | undefined>;
-  archiveSearchedProperty(userId: string, propertyId: string, propertyDetails: any, notes?: string): Promise<PropertyArchiveEntry>;
+  archiveSearchedProperty(userId: string, propertyId: string, propertyDetails: PropertyDetails | unknown, notes?: string): Promise<PropertyArchiveEntry>;
   getPropertyArchive(userId: string): Promise<PropertyArchiveEntry[]>;
   deductCredits(userId: string, amount: number): Promise<UserCredit | undefined>;
 }
@@ -282,27 +282,27 @@ export class MemStorage implements IStorage {
     return Array.from(this.nriChecklists.values()).find(c => c.nriEmail === nriEmail);
   }
 
-  async createNRIChecklist(checklist: Partial<NRIDocumentChecklist>): Promise<NRIDocumentChecklist> {
+  async createNRIChecklist(checklist: InsertNRIChecklist): Promise<NRIDocumentChecklist> {
     const newChecklist: NRIDocumentChecklist = {
       id: randomUUID(),
-      nriEmail: checklist.nriEmail ?? "",
-      propertyId: checklist.propertyId,
-      passportVerified: checklist.passportVerified || false,
-      panCardVerified: checklist.panCardVerified || false,
-      ociPioVerified: checklist.ociPioVerified || false,
-      nreNroAccountVerified: checklist.nreNroAccountVerified || false,
-      incomeProofSubmitted: checklist.incomeProofSubmitted || false,
-      poaNotarized: checklist.poaNotarized || false,
-      poaAttested: checklist.poaAttested || false,
-      form15caRequired: checklist.form15caRequired || false,
-      form15caSubmitted: checklist.form15caSubmitted || false,
-      femalCompliance: checklist.femalCompliance || false,
-      repatriationEligible: checklist.repatriationEligible || false,
-      repatriationLimit: checklist.repatriationLimit || "USD 1 Million",
-      paymentChannelVerified: checklist.paymentChannelVerified || false,
-      complianceScore: 0,
-      completionPercentage: 0,
-      remarks: "",
+      nriEmail: checklist.nriEmail,
+      propertyId: checklist.propertyId ?? null,
+      passportVerified: checklist.passportVerified ?? false,
+      panCardVerified: checklist.panCardVerified ?? false,
+      ociPioVerified: checklist.ociPioVerified ?? false,
+      nreNroAccountVerified: checklist.nreNroAccountVerified ?? false,
+      incomeProofSubmitted: checklist.incomeProofSubmitted ?? false,
+      poaNotarized: checklist.poaNotarized ?? false,
+      poaAttested: checklist.poaAttested ?? false,
+      form15caRequired: checklist.form15caRequired ?? false,
+      form15caSubmitted: checklist.form15caSubmitted ?? false,
+      femalCompliance: checklist.femalCompliance ?? false,
+      repatriationEligible: checklist.repatriationEligible ?? false,
+      repatriationLimit: checklist.repatriationLimit ?? "USD 1 Million",
+      paymentChannelVerified: checklist.paymentChannelVerified ?? false,
+      complianceScore: checklist.complianceScore ?? 0,
+      completionPercentage: checklist.completionPercentage ?? 0,
+      remarks: checklist.remarks ?? "",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -504,7 +504,7 @@ export class MemStorage implements IStorage {
     return prop;
   }
 
-  async archiveSearchedProperty(userId: string, propertyId: string, propertyDetails: any, notes?: string): Promise<PropertyArchiveEntry> {
+  async archiveSearchedProperty(userId: string, propertyId: string, propertyDetails: PropertyDetails | unknown, notes?: string): Promise<PropertyArchiveEntry> {
     const archive: PropertyArchiveEntry = {
       id: randomUUID(),
       userId,

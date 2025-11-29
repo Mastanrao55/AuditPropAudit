@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Shield } from "lucide-react";
+import { Check, Shield, Star } from "lucide-react";
 
 export default function Pricing() {
   const plans = [
@@ -36,6 +36,24 @@ export default function Pricing() {
       ],
       cta: "Get Started",
       popular: true,
+    },
+    {
+      name: "Property Verification",
+      price: "₹24,999",
+      period: "/property",
+      description: "Comprehensive property verification and analysis",
+      features: [
+        "360° property due-diligence",
+        "30-year title verification",
+        "Fraud detection analysis",
+        "Complete documentation review",
+        "RERA compliance check",
+        "Litigation history search",
+        "Detailed risk assessment",
+        "Word document report",
+      ],
+      cta: "Request Quote",
+      highlighted: true,
     },
     {
       name: "Enterprise",
@@ -92,14 +110,25 @@ export default function Pricing() {
         {/* Pricing Cards */}
         <section className="py-16 md:py-24">
           <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="grid md:grid-cols-4 gap-6 mb-12">
               {plans.map((plan, i) => (
                 <Card
                   key={i}
-                  className={`border-muted relative ${plan.popular ? "ring-2 ring-primary shadow-lg" : ""}`}
+                  className={`border-muted relative ${
+                    plan.popular ? "ring-2 ring-primary shadow-lg md:col-span-1" : ""
+                  } ${
+                    plan.highlighted ? "ring-2 ring-amber-500 shadow-lg" : ""
+                  } ${
+                    plan.name === "Enterprise" ? "md:col-span-1" : ""
+                  }`}
                 >
                   {plan.popular && (
                     <Badge className="absolute -top-3 left-4">Most Popular</Badge>
+                  )}
+                  {plan.highlighted && (
+                    <Badge className="absolute -top-3 left-4 bg-amber-500 hover:bg-amber-600 flex items-center gap-1">
+                      <Star className="h-3 w-3" /> Premium
+                    </Badge>
                   )}
                   <CardHeader>
                     <CardTitle>{plan.name}</CardTitle>
@@ -111,8 +140,16 @@ export default function Pricing() {
                       <div className="text-sm text-muted-foreground">{plan.period}</div>
                     </div>
 
-                    <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
-                      {plan.cta}
+                    <Button 
+                      className="w-full" 
+                      variant={plan.popular || plan.highlighted ? "default" : "outline"}
+                      asChild={plan.name === "Property Verification" || plan.name === "Enterprise"}
+                    >
+                      {(plan.name === "Property Verification" || plan.name === "Enterprise") ? (
+                        <Link href="/contact">{plan.cta}</Link>
+                      ) : (
+                        plan.cta
+                      )}
                     </Button>
 
                     <div className="space-y-3">
@@ -128,14 +165,23 @@ export default function Pricing() {
               ))}
             </div>
 
-            <div className="bg-muted/30 rounded-lg p-8 border text-center mb-8">
-              <h2 className="text-2xl font-bold mb-4">Enterprise Support</h2>
+            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-lg p-8 border-2 border-primary/20 text-center mb-8">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Star className="h-5 w-5 text-amber-500" />
+                <h2 className="text-2xl font-bold">Custom Solutions</h2>
+                <Star className="h-5 w-5 text-amber-500" />
+              </div>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Need a custom solution? Our enterprise team is ready to discuss your unique requirements and build a tailored plan.
+                Need something tailored to your unique requirements? Our enterprise team specializes in building custom solutions for large organizations, agencies, and specialized use cases. We offer flexible pricing, dedicated support, and full integration assistance.
               </p>
-              <Button variant="outline" asChild>
-                <Link href="/sign-in">Contact Sales Team</Link>
-              </Button>
+              <div className="flex gap-4 justify-center">
+                <Button variant="default" asChild>
+                  <Link href="/contact">Contact Sales Team</Link>
+                </Button>
+                <Button variant="outline">
+                  Schedule a Demo
+                </Button>
+              </div>
             </div>
           </div>
         </section>

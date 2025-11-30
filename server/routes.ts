@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { 
   insertContactMessageSchema, 
   insertUserSchema, 
@@ -8,10 +11,28 @@ import {
   insertUserPropertySchema, 
   insertNRIChecklistSchema,
   insertPropertyArchiveSchema,
+  registerUserSchema,
+  loginUserSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+  requestOTPSchema,
+  verifyOTPSchema,
   type NewsArticle 
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
+import * as auth from "./auth";
+import { sendVerificationEmail, sendPasswordResetEmail, sendOTPEmail } from "./email";
+import { sendOTPSMS } from "./sms";
+
+declare module "express-session" {
+  interface SessionData {
+    userId?: string;
+    email?: string;
+    role?: string;
+  }
+}
 
 const NEWS_SOURCES = [
   { name: "Real Estate", keywords: "real estate property market housing" },
@@ -67,6 +88,337 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session configuration
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    pool,
+    createTableIfMissing: true,
+    tableName: "sessions",
+  });
+
+  app.use(
+    session({
+      store: sessionStore,
+      secret: process.env.SESSION_SECRET || "auditprop-dev-secret-change-in-production",
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      },
+    })
+  );
+
+  // Auth middleware
+  const requireAuth = (req: any, res: any, next: any) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    next();
+  };
+
+  // =====================
+  // AUTHENTICATION ROUTES
+  // =====================
+
+  // Register new user
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const data = registerUserSchema.parse(req.body);
+      
+      const existingUser = await auth.getUserByEmail(data.email);
+      if (existingUser) {
+        return res.status(400).json({ error: "Email already registered" });
+      }
+      
+      const user = await auth.createUser({
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+      });
+      
+      const token = await auth.createEmailVerificationToken(user.id);
+      await sendVerificationEmail(user.email!, token);
+      
+      res.json({ 
+        success: true, 
+        message: "Registration successful. Please check your email to verify your account.",
+        userId: user.id 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
+  // Login with email/password
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const data = loginUserSchema.parse(req.body);
+      
+      const user = await auth.getUserByEmail(data.email);
+      if (!user || !user.hashedPassword) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      const isValid = await auth.verifyPassword(data.password, user.hashedPassword);
+      if (!isValid) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      if (!user.emailVerified) {
+        return res.status(403).json({ 
+          error: "Please verify your email before logging in",
+          requiresVerification: true 
+        });
+      }
+      
+      if (user.status !== "active") {
+        return res.status(403).json({ error: "Your account has been suspended" });
+      }
+      
+      await auth.updateLastLogin(user.id);
+      
+      req.session.userId = user.id;
+      req.session.email = user.email!;
+      req.session.role = user.role;
+      
+      res.json({ 
+        success: true, 
+        user: {
+          id: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+          emailVerified: user.emailVerified,
+          phoneVerified: user.phoneVerified,
+        }
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Logout
+  app.post("/api/auth/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      res.clearCookie("connect.sid");
+      res.json({ success: true });
+    });
+  });
+
+  // Get current user
+  app.get("/api/auth/user", async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    
+    const user = await auth.getUserById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    res.json({
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role,
+      emailVerified: user.emailVerified,
+      phoneVerified: user.phoneVerified,
+    });
+  });
+
+  // Verify email
+  app.post("/api/auth/verify-email", async (req, res) => {
+    try {
+      const { token } = verifyEmailSchema.parse(req.body);
+      const result = await auth.verifyEmailToken(token);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      res.json({ success: true, message: "Email verified successfully" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Verification failed" });
+    }
+  });
+
+  // Resend verification email
+  app.post("/api/auth/resend-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      const user = await auth.getUserByEmail(email);
+      if (!user) {
+        return res.json({ success: true, message: "If the email exists, a verification link has been sent" });
+      }
+      
+      if (user.emailVerified) {
+        return res.status(400).json({ error: "Email is already verified" });
+      }
+      
+      const token = await auth.createEmailVerificationToken(user.id);
+      await sendVerificationEmail(user.email!, token);
+      
+      res.json({ success: true, message: "Verification email sent" });
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      res.status(500).json({ error: "Failed to resend verification email" });
+    }
+  });
+
+  // Forgot password
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      
+      const user = await auth.getUserByEmail(email);
+      if (user) {
+        const token = await auth.createPasswordResetToken(user.id);
+        await sendPasswordResetEmail(user.email!, token);
+      }
+      
+      res.json({ 
+        success: true, 
+        message: "If an account exists with this email, a password reset link has been sent" 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Failed to process request" });
+    }
+  });
+
+  // Reset password
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const { token, password } = resetPasswordSchema.parse(req.body);
+      const result = await auth.resetPasswordWithToken(token, password);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      res.json({ success: true, message: "Password reset successfully" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  // Request OTP (SMS)
+  app.post("/api/auth/otp/request", async (req, res) => {
+    try {
+      const { phoneNumber } = requestOTPSchema.parse(req.body);
+      
+      const user = await auth.getUserByPhone(phoneNumber);
+      const { otp } = await auth.createOTPChallenge(phoneNumber, "sms", user?.id);
+      
+      const result = await sendOTPSMS(phoneNumber, otp);
+      if (!result.success) {
+        return res.status(500).json({ error: "Failed to send OTP" });
+      }
+      
+      res.json({ success: true, message: "OTP sent successfully" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      console.error("OTP request error:", error);
+      res.status(500).json({ error: "Failed to send OTP" });
+    }
+  });
+
+  // Verify OTP and login
+  app.post("/api/auth/otp/verify", async (req, res) => {
+    try {
+      const { phoneNumber, code } = verifyOTPSchema.parse(req.body);
+      const result = await auth.verifyOTP(phoneNumber, code);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      if (result.userId) {
+        const user = await auth.getUserById(result.userId);
+        if (user) {
+          req.session.userId = user.id;
+          req.session.email = user.email!;
+          req.session.role = user.role;
+          
+          return res.json({ 
+            success: true, 
+            isNewUser: false,
+            user: {
+              id: user.id,
+              email: user.email,
+              fullName: user.fullName,
+              role: user.role,
+            }
+          });
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        isNewUser: true,
+        message: "OTP verified. Please complete registration.",
+        phoneNumber 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "OTP verification failed" });
+    }
+  });
+
+  // Request Email OTP
+  app.post("/api/auth/email-otp/request", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      const user = await auth.getUserByEmail(email);
+      const { otp } = await auth.createOTPChallenge(email, "email", user?.id);
+      
+      await sendOTPEmail(email, otp);
+      
+      res.json({ success: true, message: "OTP sent to your email" });
+    } catch (error) {
+      console.error("Email OTP request error:", error);
+      res.status(500).json({ error: "Failed to send OTP" });
+    }
+  });
+
+  // =====================
+  // EXISTING ROUTES
+  // =====================
+
   // Admin: List all users
   app.get("/api/admin/users", async (req, res) => {
     try {

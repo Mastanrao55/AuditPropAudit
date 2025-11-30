@@ -1,18 +1,63 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, numeric, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, numeric, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
-  email: text("email"),
-  password: text("password").notNull(),
+  email: text("email").unique(),
+  hashedPassword: text("hashed_password"),
+  phoneNumber: text("phone_number"),
   role: text("role").notNull().default("user"), // user, admin, auditor, nri_user
   fullName: text("full_name"),
+  emailVerified: boolean("email_verified").default(false),
+  phoneVerified: boolean("phone_verified").default(false),
   status: text("status").notNull().default("active"), // active, inactive, suspended
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+export const emailVerificationTokens = pgTable("email_verification_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const otpChallenges = pgTable("otp_challenges", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id"),
+  channel: text("channel").notNull(), // sms, email
+  destination: text("destination").notNull(), // phone number or email
+  codeHash: text("code_hash").notNull(),
+  attempts: integer("attempts").default(0),
+  maxAttempts: integer("max_attempts").default(3),
+  expiresAt: timestamp("expires_at").notNull(),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const contactMessages = pgTable("contact_messages", {
@@ -296,19 +341,61 @@ export const propertyArchive = pgTable("property_archive", {
   rating: integer("rating"), // 1-5
 });
 
+// Auth-related types
+export type Session = typeof sessions.$inferSelect;
+export type EmailVerificationToken = typeof emailVerificationTokens.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type OTPChallenge = typeof otpChallenges.$inferSelect;
+
 // Schemas & Types
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
-  password: true,
 }).extend({
-  email: z.string().email().optional(),
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   fullName: z.string().optional(),
+  phoneNumber: z.string().optional(),
+});
+
+export const loginUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1, "Password is required"),
+});
+
+export const registerUserSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  fullName: z.string().min(2, "Full name is required"),
+  phoneNumber: z.string().optional(),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+});
+
+export const requestOTPSchema = z.object({
+  phoneNumber: z.string().min(10, "Invalid phone number"),
+});
+
+export const verifyOTPSchema = z.object({
+  phoneNumber: z.string().min(10, "Invalid phone number"),
+  code: z.string().length(6, "OTP must be 6 digits"),
 });
 
 export const updateUserSchema = z.object({
   role: z.enum(["user", "admin", "auditor", "nri_user"]).optional(),
   status: z.enum(["active", "inactive", "suspended"]).optional(),
   fullName: z.string().optional(),
+  phoneNumber: z.string().optional(),
 });
 
 export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({

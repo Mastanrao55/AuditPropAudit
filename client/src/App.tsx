@@ -14,6 +14,10 @@ import DataSources from "@/pages/data-sources";
 import Pricing from "@/pages/pricing";
 import APIPage from "@/pages/api";
 import SignIn from "@/pages/sign-in";
+import SignUp from "@/pages/sign-up";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
+import VerifyEmail from "@/pages/verify-email";
 import AuditReports from "@/pages/audit-reports";
 import Settings from "@/pages/settings";
 import Contact from "@/pages/contact";
@@ -65,6 +69,10 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/api" component={APIPage} />
       <Route path="/sign-in" component={SignIn} />
+      <Route path="/sign-up" component={SignUp} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/contact" component={Contact} />
       <Route path="/news" component={News} />
       <Route component={NotFound} />

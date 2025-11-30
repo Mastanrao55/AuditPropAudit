@@ -328,10 +328,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // OTP request rate limiting (in-memory, per phone number)
+  const otpRequestCounts = new Map<string, { count: number; resetAt: number }>();
+  const OTP_RATE_LIMIT = 3; // Max requests per window
+  const OTP_RATE_WINDOW = 5 * 60 * 1000; // 5 minutes
+
   // Request OTP (SMS)
   app.post("/api/auth/otp/request", async (req, res) => {
     try {
       const { phoneNumber } = requestOTPSchema.parse(req.body);
+      
+      // Rate limiting check
+      const now = Date.now();
+      const rateData = otpRequestCounts.get(phoneNumber);
+      
+      if (rateData) {
+        if (now < rateData.resetAt) {
+          if (rateData.count >= OTP_RATE_LIMIT) {
+            const minutesLeft = Math.ceil((rateData.resetAt - now) / 60000);
+            return res.status(429).json({ 
+              error: `Too many OTP requests. Please try again in ${minutesLeft} minute(s).` 
+            });
+          }
+          rateData.count++;
+        } else {
+          rateData.count = 1;
+          rateData.resetAt = now + OTP_RATE_WINDOW;
+        }
+      } else {
+        otpRequestCounts.set(phoneNumber, { count: 1, resetAt: now + OTP_RATE_WINDOW });
+      }
       
       const user = await auth.getUserByPhone(phoneNumber);
       const { otp } = await auth.createOTPChallenge(phoneNumber, "sms", user?.id);

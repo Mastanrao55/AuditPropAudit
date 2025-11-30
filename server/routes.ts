@@ -343,6 +343,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Feature 12: Market Intelligence endpoints
+  // NOTE: More specific route must come BEFORE generic parameterized route
+  app.get("/api/market/city/:city", async (req, res) => {
+    try {
+      const records = await storage.listMarketIntelligenceByCity(req.params.city);
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch market records" });
+    }
+  });
+
   app.get("/api/market/:city/:monthYear", async (req, res) => {
     try {
       const intelligence = await storage.getMarketIntelligence(
@@ -355,15 +365,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(intelligence);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch market intelligence" });
-    }
-  });
-
-  app.get("/api/market/city/:city", async (req, res) => {
-    try {
-      const records = await storage.listMarketIntelligenceByCity(req.params.city);
-      res.json(records);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to fetch market records" });
     }
   });
 

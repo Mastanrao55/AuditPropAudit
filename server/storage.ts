@@ -23,6 +23,10 @@ export interface IStorage {
   // Litigation Case methods
   getLitigationCase(caseNumber: string): Promise<LitigationCase | undefined>;
   listLitigationCasesByProperty(propertyAddress: string): Promise<LitigationCase[]>;
+  searchLitigationByOwner(ownerName: string, state?: string): Promise<LitigationCase[]>;
+  searchLitigationByPropertyId(propertyId: string): Promise<LitigationCase[]>;
+  listLitigationCasesByState(state: string): Promise<LitigationCase[]>;
+  getHighRiskLitigationCases(): Promise<LitigationCase[]>;
   
   // NRI Document Checklist methods
   getNRIChecklist(nriEmail: string): Promise<NRIDocumentChecklist | undefined>;
@@ -33,6 +37,7 @@ export interface IStorage {
   
   // Fraud Detection methods
   getFraudScore(propertyId: string): Promise<FraudDetectionScore | undefined>;
+  analyzeFraudRisks(propertyId: string, ownerName: string, address: string, state: string): Promise<FraudDetectionScore>;
   
   // Developer Audit methods
   getDeveloperAudit(developerId: string, year: number): Promise<DeveloperAudit | undefined>;

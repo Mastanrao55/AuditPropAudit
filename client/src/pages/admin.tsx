@@ -73,6 +73,55 @@ export default function AdminDashboard() {
           })}
         </div>
 
+        {/* Admin Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Manage user roles, permissions, and access control across the platform.
+              </p>
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">Available Roles:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• <strong>Admin</strong> - Full system access and user management</li>
+                  <li>• <strong>Auditor</strong> - Manual verification and review</li>
+                  <li>• <strong>NRI User</strong> - NRI compliance specialist access</li>
+                  <li>• <strong>User</strong> - Standard user access</li>
+                </ul>
+              </div>
+              <Button asChild className="w-full">
+                <a href="/admin/users">Manage Users</a>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Role-Based Access Control</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Control user access and permissions based on their assigned roles.
+              </p>
+              <div className="space-y-2">
+                <h4 className="font-semibold text-sm">RBAC Features:</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>✓ Role assignment and management</li>
+                  <li>✓ User status control (active/inactive/suspended)</li>
+                  <li>✓ Access restriction by role</li>
+                  <li>✓ Audit trail for user actions</li>
+                </ul>
+              </div>
+              <Button variant="outline" className="w-full">
+                View RBAC Configuration
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Management Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Users Management */}

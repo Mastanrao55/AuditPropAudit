@@ -19,6 +19,7 @@ import Settings from "@/pages/settings";
 import Contact from "@/pages/contact";
 import News from "@/pages/news";
 import AdminDashboard from "@/pages/admin";
+import AdminUsers from "@/pages/admin-users";
 import AuditorDashboard from "@/pages/auditor";
 import VerificationHub from "@/pages/verification-hub";
 import NRI from "@/pages/nri";
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/" component={LandingPage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin/users" component={AdminUsers} />
       <Route path="/auditor" component={AuditorDashboard} />
       <Route path="/verification" component={VerificationHub} />
       <Route path="/review" component={ReviewQueue} />

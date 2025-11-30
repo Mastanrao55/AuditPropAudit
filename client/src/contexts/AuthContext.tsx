@@ -4,7 +4,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: "admin" | "user" | "auditor";
+  role: "admin" | "user" | "auditor" | "nri_user";
 }
 
 interface AuthContextType {
@@ -24,9 +24,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         // Mock user creation based on email
-        let role: "admin" | "user" | "auditor" = "user";
+        let role: "admin" | "user" | "auditor" | "nri_user" = "user";
         if (email === "admin@auditprop.com") role = "admin";
         else if (email === "auditor@auditprop.com") role = "auditor";
+        else if (email === "nri@auditprop.com") role = "nri_user";
         
         const mockUser: User = {
           id: Math.random().toString(36).substr(2, 9),

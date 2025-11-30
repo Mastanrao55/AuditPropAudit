@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { 
   insertContactMessageSchema, 
   insertUserSchema, 
+  updateUserSchema,
   insertUserPropertySchema, 
   insertNRIChecklistSchema,
   insertPropertyArchiveSchema,
@@ -66,6 +67,63 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Admin: List all users
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      const users = await storage.listAllUsers();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  // Admin: Update user role
+  app.patch("/api/admin/users/:userId/role", async (req, res) => {
+    try {
+      const { role } = req.body;
+      if (!["user", "admin", "auditor", "nri_user"].includes(role)) {
+        return res.status(400).json({ error: "Invalid role" });
+      }
+      const user = await storage.updateUserRole(req.params.userId, role);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ success: true, user });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user role" });
+    }
+  });
+
+  // Admin: Update user status
+  app.patch("/api/admin/users/:userId/status", async (req, res) => {
+    try {
+      const { status } = req.body;
+      if (!["active", "inactive", "suspended"].includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+      const user = await storage.updateUserStatus(req.params.userId, status);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ success: true, user });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update user status" });
+    }
+  });
+
+  // Admin: Delete user
+  app.delete("/api/admin/users/:userId", async (req, res) => {
+    try {
+      const success = await storage.deleteUser(req.params.userId);
+      if (!success) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
   // Contact endpoint
   app.post("/api/contact", async (req, res) => {
     try {

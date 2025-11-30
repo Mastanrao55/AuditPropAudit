@@ -6,8 +6,13 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
+  email: text("email"),
   password: text("password").notNull(),
-  role: text("role").notNull().default("user"),
+  role: text("role").notNull().default("user"), // user, admin, auditor, nri_user
+  fullName: text("full_name"),
+  status: text("status").notNull().default("active"), // active, inactive, suspended
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const contactMessages = pgTable("contact_messages", {
@@ -295,6 +300,15 @@ export const propertyArchive = pgTable("property_archive", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+}).extend({
+  email: z.string().email().optional(),
+  fullName: z.string().optional(),
+});
+
+export const updateUserSchema = z.object({
+  role: z.enum(["user", "admin", "auditor", "nri_user"]).optional(),
+  status: z.enum(["active", "inactive", "suspended"]).optional(),
+  fullName: z.string().optional(),
 });
 
 export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
@@ -313,6 +327,7 @@ export const insertContactMessageSchema = createInsertSchema(contactMessages).om
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
 export type ContactMessage = typeof contactMessages.$inferSelect;

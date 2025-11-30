@@ -6,6 +6,10 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  listAllUsers(): Promise<User[]>;
+  updateUserRole(userId: string, role: string): Promise<User | undefined>;
+  updateUserStatus(userId: string, status: string): Promise<User | undefined>;
+  deleteUser(userId: string): Promise<boolean>;
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
   
   // Encumbrance Certificate methods
@@ -191,9 +195,44 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id, role: "user" };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      role: "user",
+      status: "active",
+      email: insertUser.email ?? null,
+      fullName: insertUser.fullName ?? null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async listAllUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async updateUserRole(userId: string, role: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.role = role;
+      user.updatedAt = new Date();
+    }
+    return user;
+  }
+
+  async updateUserStatus(userId: string, status: string): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (user) {
+      user.status = status;
+      user.updatedAt = new Date();
+    }
+    return user;
+  }
+
+  async deleteUser(userId: string): Promise<boolean> {
+    return this.users.delete(userId);
   }
 
   async createContactMessage(insertMessage: InsertContactMessage): Promise<ContactMessage> {

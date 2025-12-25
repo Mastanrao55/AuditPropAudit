@@ -99,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(
     session({
       store: sessionStore,
-      secret: process.env.SESSION_SECRET || "auditprop-dev-secret-change-in-production",
+      secret: process.env.SESSION_SECRET || "assetzaudit-dev-secret-change-in-production",
       resave: false,
       saveUninitialized: false,
       cookie: {

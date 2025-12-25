@@ -1,6 +1,6 @@
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@auditprop.com";
-const APP_NAME = "AuditProp";
+const FROM_EMAIL = process.env.FROM_EMAIL || "noreply@assetzaudit.com";
+const APP_NAME = "AssetzAudit";
 
 interface EmailOptions {
   to: string;

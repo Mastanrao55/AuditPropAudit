@@ -13,7 +13,7 @@ export default function NRISolutions() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">AuditProp</span>
+            <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
           </div>
         </Link>
         <div className="flex items-center gap-4">
@@ -36,7 +36,7 @@ export default function NRISolutions() {
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight">NRI Property Investment Solutions</h1>
               </div>
               <p className="text-xl text-muted-foreground mb-8">
-                AuditProp specializes in helping Non-Resident Indians navigate India's real estate market with complete confidence. Our platform simplifies property verification, compliance, and investment decisions for NRI buyers worldwide.
+                AssetzAudit specializes in helping Non-Resident Indians navigate India's real estate market with complete confidence. Our platform simplifies property verification, compliance, and investment decisions for NRI buyers worldwide.
               </p>
               <div className="flex gap-4">
                 <Button size="lg" asChild>
@@ -52,13 +52,13 @@ export default function NRISolutions() {
           </div>
         </section>
 
-        {/* Why NRIs Choose AuditProp */}
+        {/* Why NRIs Choose AssetzAudit */}
         <section className="py-16 md:py-24 border-b">
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mb-12">
-              <h2 className="text-3xl font-bold tracking-tight mb-4">Why NRIs Choose AuditProp</h2>
+              <h2 className="text-3xl font-bold tracking-tight mb-4">Why NRIs Choose AssetzAudit</h2>
               <p className="text-muted-foreground">
-                Investing in Indian real estate as an NRI involves unique challenges. From regulatory compliance to fraud detection, AuditProp provides peace of mind.
+                Investing in Indian real estate as an NRI involves unique challenges. From regulatory compliance to fraud detection, AssetzAudit provides peace of mind.
               </p>
             </div>
 
@@ -192,7 +192,7 @@ export default function NRISolutions() {
             <div className="max-w-2xl mb-12">
               <h2 className="text-3xl font-bold tracking-tight mb-4">Complete NRI Property Purchase Journey</h2>
               <p className="text-muted-foreground">
-                From initial property search to final registration, AuditProp guides you through every step.
+                From initial property search to final registration, AssetzAudit guides you through every step.
               </p>
             </div>
 
@@ -357,7 +357,7 @@ export default function NRISolutions() {
             <div className="max-w-2xl mb-12">
               <h2 className="text-3xl font-bold tracking-tight mb-4">Success Stories</h2>
               <p className="text-muted-foreground">
-                See how NRI investors have successfully invested in Indian real estate with AuditProp's guidance.
+                See how NRI investors have successfully invested in Indian real estate with AssetzAudit's guidance.
               </p>
             </div>
 
@@ -368,7 +368,7 @@ export default function NRISolutions() {
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <p className="text-muted-foreground">
-                    "Investing from abroad was intimidating. AuditProp's NRI Suite made everything transparent. Within 3 months, I had a 30-year clean title, RERA verification, and complete tax compliance guidance. The fraud detection gave me confidence to proceed."
+                    "Investing from abroad was intimidating. AssetzAudit's NRI Suite made everything transparent. Within 3 months, I had a 30-year clean title, RERA verification, and complete tax compliance guidance. The fraud detection gave me confidence to proceed."
                   </p>
                   <p className="text-xs text-muted-foreground italic">— Verified NRI Investor, Silicon Valley</p>
                 </CardContent>
@@ -380,7 +380,7 @@ export default function NRISolutions() {
                 </CardHeader>
                 <CardContent className="space-y-4 text-sm">
                   <p className="text-muted-foreground">
-                    "The NRE/NRO account comparison and tax guide saved me ₹3L in unnecessary taxes. AuditProp caught a red flag in the litigation history that my local consultant missed. Absolutely worth it."
+                    "The NRE/NRO account comparison and tax guide saved me ₹3L in unnecessary taxes. AssetzAudit caught a red flag in the litigation history that my local consultant missed. Absolutely worth it."
                   </p>
                   <p className="text-xs text-muted-foreground italic">— Medical Professional, London</p>
                 </CardContent>
@@ -414,7 +414,7 @@ export default function NRISolutions() {
 
       <footer className="border-t border-border py-12 bg-card">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 AuditProp Technologies. All rights reserved.</p>
+          <p>© 2025 AssetzAudit Technologies. All rights reserved.</p>
           <p className="mt-2">Empowering NRI investors with confidence and compliance.</p>
         </div>
       </footer>

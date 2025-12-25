@@ -81,7 +81,7 @@ export function Layout({ children }: LayoutProps) {
         <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
           <ShieldCheck className="h-5 w-5 text-white" />
         </div>
-        <span className="font-bold text-xl tracking-tight">AuditProp</span>
+        <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
       </div>
 
       <div className="flex-1 py-6 px-4 space-y-1">

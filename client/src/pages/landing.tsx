@@ -27,14 +27,14 @@ export default function LandingPage() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "AuditProp-Features-Guide.docx";
+      a.download = "AssetzAudit-Features-Guide.docx";
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       toast({
         title: "Downloaded",
-        description: "AuditProp Features Guide has been downloaded successfully.",
+        description: "AssetzAudit Features Guide has been downloaded successfully.",
       });
     } catch (error) {
       toast({
@@ -65,7 +65,7 @@ export default function LandingPage() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">AuditProp</span>
+            <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <Link href="/solutions" className="hover:text-foreground transition-colors" data-testid="link-solutions">

@@ -208,7 +208,7 @@ export default function ComprehensiveDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">AuditProp Platform</h1>
+            <h1 className="text-4xl font-bold tracking-tight">AssetzAudit Platform</h1>
             <p className="text-muted-foreground mt-2">
               Comprehensive property intelligence, verification, and compliance platform for India real estate
             </p>
@@ -473,7 +473,7 @@ export default function ComprehensiveDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-blue-600" />
-              Why Choose AuditProp
+              Why Choose AssetzAudit
             </CardTitle>
           </CardHeader>
           <CardContent>

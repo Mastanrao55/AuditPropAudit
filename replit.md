@@ -1,8 +1,8 @@
-# AuditProp - 360° Property Due-Diligence Platform
+# AssetzAudit - 360° Property Due-Diligence Platform
 
 ## Overview
 
-AuditProp is an enterprise-grade property audit platform designed for the Indian real estate market. The application provides comprehensive 360° property due-diligence by aggregating data from multiple sources including ownership records, legal cases, financial encumbrances, and regulatory databases. Users can search properties by name, survey number, or owner details to receive verified risk scores and downloadable audit reports.
+AssetzAudit is an enterprise-grade property audit platform designed for the Indian real estate market. The application provides comprehensive 360° property due-diligence by aggregating data from multiple sources including ownership records, legal cases, financial encumbrances, and regulatory databases. Users can search properties by name, survey number, or owner details to receive verified risk scores and downloadable audit reports.
 
 The platform is built as a full-stack TypeScript application with a React frontend and Express backend, currently using in-memory storage with planned PostgreSQL integration via Drizzle ORM.
 

@@ -160,7 +160,7 @@ export default function LandingPage() {
               <span className="text-primary">Property Due Diligence</span>
             </h1>
             <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-              AuditProp delivers 360° verified property audits. We combine ownership history, legal checks, financial encumbrances, and fraud detection into a single trust score.
+              AssetzAudit delivers 360° verified property audits. We combine ownership history, legal checks, financial encumbrances, and fraud detection into a single trust score.
             </p>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function LandingPage() {
       <section className="py-3 bg-muted/30 border-t border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-xl font-bold mb-3 text-center">Try AuditProp Now</h2>
+            <h2 className="text-xl font-bold mb-3 text-center">Try AssetzAudit Now</h2>
             <div className="flex flex-col sm:flex-row gap-3">
               <Input 
                 placeholder="Search by property name, survey number, or owner..." 
@@ -251,10 +251,10 @@ export default function LandingPage() {
             <div className="h-6 w-6 bg-primary rounded flex items-center justify-center">
               <ShieldCheck className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-lg tracking-tight">AuditProp</span>
+            <span className="font-bold text-lg tracking-tight">AssetzAudit</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2025 AuditProp Technologies. All rights reserved.
+            © 2025 AssetzAudit Technologies. All rights reserved.
           </p>
         </div>
       </footer>

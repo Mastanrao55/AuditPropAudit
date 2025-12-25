@@ -157,7 +157,7 @@ export default function SignIn() {
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold text-xl tracking-tight">AuditProp</span>
+              <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
             </div>
           </Link>
         </header>
@@ -215,7 +215,7 @@ export default function SignIn() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl tracking-tight">AuditProp</span>
+            <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
           </div>
         </Link>
         <div className="flex items-center gap-4">
@@ -417,7 +417,7 @@ export default function SignIn() {
 
       <footer className="border-t border-border py-12 bg-card">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 AuditProp Technologies. All rights reserved.</p>
+          <p>© 2025 AssetzAudit Technologies. All rights reserved.</p>
         </div>
       </footer>
     </div>

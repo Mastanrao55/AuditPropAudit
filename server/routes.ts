@@ -994,12 +994,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/features-document", async (req, res) => {
     try {
       const paragraphs = [
-        new Paragraph({ text: "AuditProp Platform - Complete Features Guide", heading: HeadingLevel.HEADING_1, spacing: { line: 360 } }),
+        new Paragraph({ text: "AssetzAudit Platform - Complete Features Guide", heading: HeadingLevel.HEADING_1, spacing: { line: 360 } }),
         new Paragraph({ text: "Comprehensive Property Due-Diligence & Verification System for Indian Real Estate", heading: HeadingLevel.HEADING_2, spacing: { line: 360 } }),
         new Paragraph({ text: " " }),
 
         new Paragraph({ text: "Platform Overview", heading: HeadingLevel.HEADING_1, spacing: { line: 360 } }),
-        new Paragraph({ text: "AuditProp is an enterprise-grade property audit platform designed for the Indian real estate market. It provides 360° verified property audits combining ownership history, legal checks, financial encumbrances, fraud detection, and regulatory compliance verification into a single comprehensive trust score.", spacing: { line: 360 } }),
+        new Paragraph({ text: "AssetzAudit is an enterprise-grade property audit platform designed for the Indian real estate market. It provides 360° verified property audits combining ownership history, legal checks, financial encumbrances, fraud detection, and regulatory compliance verification into a single comprehensive trust score.", spacing: { line: 360 } }),
         new Paragraph({ text: " " }),
 
         new Paragraph({ text: "1. Property Verification Features (6 Features)", heading: HeadingLevel.HEADING_1, spacing: { line: 360 } }),
@@ -1125,7 +1125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         new Paragraph({ text: "State Management: TanStack Query + React Context", spacing: { line: 360, before: 120, after: 120 } }),
 
         new Paragraph({ text: "Summary", heading: HeadingLevel.HEADING_1, spacing: { line: 360 } }),
-        new Paragraph({ text: "AuditProp delivers a comprehensive 360° property due-diligence platform with 26+ features covering property verification, fraud detection, compliance management, market intelligence, and user administration. The platform integrates multiple data sources and regulatory databases to provide verified risk scores and actionable insights for property buyers, investors, and real estate professionals in India.", spacing: { line: 360 } }),
+        new Paragraph({ text: "AssetzAudit delivers a comprehensive 360° property due-diligence platform with 26+ features covering property verification, fraud detection, compliance management, market intelligence, and user administration. The platform integrates multiple data sources and regulatory databases to provide verified risk scores and actionable insights for property buyers, investors, and real estate professionals in India.", spacing: { line: 360 } }),
       ];
 
       const doc = new Document({ 
@@ -1137,7 +1137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const buffer = await Packer.toBuffer(doc);
       res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-      res.setHeader("Content-Disposition", "attachment; filename=AuditProp-Features-Guide.docx");
+      res.setHeader("Content-Disposition", "attachment; filename=AssetzAudit-Features-Guide.docx");
       res.setHeader("Content-Length", buffer.length);
       res.send(buffer);
     } catch (error) {

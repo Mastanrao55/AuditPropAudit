@@ -38,6 +38,8 @@ import NRISolutions from "@/pages/nri-solutions";
 import RERADashboard from "@/pages/rera-dashboard";
 import ECDashboard from "@/pages/ec-dashboard";
 import PropertyValuation from "@/pages/property-valuation";
+import Blog from "@/pages/blog";
+import BlogArticle from "@/pages/blog-article";
 
 function Router() {
   return (
@@ -75,6 +77,8 @@ function Router() {
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/contact" component={Contact} />
       <Route path="/news" component={News} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogArticle} />
       <Route component={NotFound} />
     </Switch>
   );

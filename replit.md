@@ -39,6 +39,10 @@ Preferred communication style: Simple, everyday language.
 - Audit reports archive and download interface
 - Settings page for workspace configuration
 - Dedicated marketing pages (Solutions, Data Sources, Pricing, API)
+- Comprehensive Blog section with 8+ articles on property risk assessment
+  - Blog listing page with category filtering
+  - Individual article pages with detailed content
+  - Articles cover: Fraud Detection, EC Guide, Title Verification, Due Diligence, Litigation Risks, NRI Compliance, RERA, Market Intelligence
 
 ### Backend Architecture
 

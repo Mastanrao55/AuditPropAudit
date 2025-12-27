@@ -89,6 +89,9 @@ export default function LandingPage() {
             <Link href="/news" className="hover:text-foreground transition-colors" data-testid="link-news">
               News
             </Link>
+            <Link href="/blog" className="hover:text-foreground transition-colors" data-testid="link-blog">
+              Blog
+            </Link>
           </nav>
           <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
@@ -133,6 +136,9 @@ export default function LandingPage() {
               </Link>
               <Link href="/news" className="hover:text-foreground transition-colors py-2" data-testid="link-news-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 News
+              </Link>
+              <Link href="/blog" className="hover:text-foreground transition-colors py-2" data-testid="link-blog-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+                Blog
               </Link>
               <div className="flex flex-col gap-2 pt-3 border-t border-border">
                 <Button variant="ghost" asChild className="justify-start">

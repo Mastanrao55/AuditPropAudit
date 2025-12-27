@@ -70,6 +70,7 @@ export default function SignUp() {
   if (success) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        <SEO {...seoData.signUp} />
         <header className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -88,7 +89,7 @@ export default function SignUp() {
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                   <Mail className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Check Your Email</h2>
+                <h1 className="text-2xl font-bold">Check Your Email</h1>
                 <p className="text-muted-foreground">
                   We've sent a verification link to <strong>{email}</strong>. 
                   Please check your inbox and click the link to verify your account.
@@ -134,7 +135,7 @@ export default function SignUp() {
         <div className="w-full max-w-md">
           <Card className="border-muted">
             <CardHeader className="space-y-2">
-              <CardTitle>Create Account</CardTitle>
+              <h1 className="text-2xl font-bold tracking-tight">Create Account</h1>
               <CardDescription>
                 Sign up to access the AssetzAudit property due-diligence platform
               </CardDescription>

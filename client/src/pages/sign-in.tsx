@@ -152,6 +152,7 @@ export default function SignIn() {
   if (requiresVerification) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        <SEO {...seoData.signIn} />
         <header className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -170,7 +171,7 @@ export default function SignIn() {
                 <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
                   <Mail className="h-8 w-8 text-yellow-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Email Verification Required</h2>
+                <h1 className="text-2xl font-bold">Email Verification Required</h1>
                 <p className="text-muted-foreground">
                   Your email address <strong>{verificationEmail}</strong> has not been verified. 
                   Please check your inbox for the verification link.
@@ -231,7 +232,7 @@ export default function SignIn() {
         <div className="w-full max-w-md">
           <Card className="border-muted">
             <CardHeader className="space-y-2">
-              <CardTitle>Sign In</CardTitle>
+              <h1 className="text-2xl font-bold tracking-tight">Sign In</h1>
               <CardDescription>
                 Choose your preferred method to sign in
               </CardDescription>

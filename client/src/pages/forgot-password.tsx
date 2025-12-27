@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, ArrowLeft, Mail, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { SEO, seoData } from "@/components/seo";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -41,6 +42,7 @@ export default function ForgotPassword() {
   if (success) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        <SEO {...seoData.forgotPassword} />
         <header className="container mx-auto px-4 py-6 flex items-center justify-between">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -59,7 +61,7 @@ export default function ForgotPassword() {
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Check Your Email</h2>
+                <h1 className="text-2xl font-bold">Check Your Email</h1>
                 <p className="text-muted-foreground">
                   If an account exists with <strong>{email}</strong>, we've sent 
                   instructions to reset your password.
@@ -81,6 +83,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.forgotPassword} />
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -101,7 +104,7 @@ export default function ForgotPassword() {
         <div className="w-full max-w-md">
           <Card className="border-muted">
             <CardHeader className="space-y-2">
-              <CardTitle>Forgot Password</CardTitle>
+              <h1 className="text-2xl font-bold tracking-tight">Forgot Password</h1>
               <CardDescription>
                 Enter your email address and we'll send you a link to reset your password
               </CardDescription>

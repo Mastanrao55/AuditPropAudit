@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Shield, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { SEO, seoData } from "@/components/seo";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -79,6 +80,7 @@ export default function ResetPassword() {
   if (!token) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        <SEO {...seoData.resetPassword} />
         <header className="container mx-auto px-4 py-6">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -97,7 +99,7 @@ export default function ResetPassword() {
                 <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
                   <AlertCircle className="h-8 w-8 text-red-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Invalid Reset Link</h2>
+                <h1 className="text-2xl font-bold">Invalid Reset Link</h1>
                 <p className="text-muted-foreground">
                   This password reset link is invalid or has expired. Please request a new one.
                 </p>
@@ -119,6 +121,7 @@ export default function ResetPassword() {
   if (success) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        <SEO {...seoData.resetPassword} />
         <header className="container mx-auto px-4 py-6">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -137,7 +140,7 @@ export default function ResetPassword() {
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Password Reset</h2>
+                <h1 className="text-2xl font-bold">Password Reset</h1>
                 <p className="text-muted-foreground">
                   Your password has been successfully reset. You can now sign in with your new password.
                 </p>
@@ -158,6 +161,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.resetPassword} />
       <header className="container mx-auto px-4 py-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -173,7 +177,7 @@ export default function ResetPassword() {
         <div className="w-full max-w-md">
           <Card className="border-muted">
             <CardHeader className="space-y-2">
-              <CardTitle>Reset Your Password</CardTitle>
+              <h1 className="text-2xl font-bold tracking-tight">Reset Your Password</h1>
               <CardDescription>
                 Enter your new password below
               </CardDescription>

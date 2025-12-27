@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { SEO, seoData } from "@/components/seo";
 
 export default function VerifyEmail() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -33,6 +34,7 @@ export default function VerifyEmail() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.verifyEmail} />
       <header className="container mx-auto px-4 py-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
@@ -52,7 +54,7 @@ export default function VerifyEmail() {
                 <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                   <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
                 </div>
-                <h2 className="text-2xl font-bold">Verifying Email</h2>
+                <h1 className="text-2xl font-bold">Verifying Email</h1>
                 <p className="text-muted-foreground">
                   Please wait while we verify your email address...
                 </p>
@@ -64,7 +66,7 @@ export default function VerifyEmail() {
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
                   <CheckCircle className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Email Verified!</h2>
+                <h1 className="text-2xl font-bold">Email Verified!</h1>
                 <p className="text-muted-foreground">
                   Your email has been successfully verified. You can now sign in to your account.
                 </p>
@@ -83,7 +85,7 @@ export default function VerifyEmail() {
                 <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
                   <AlertCircle className="h-8 w-8 text-red-600" />
                 </div>
-                <h2 className="text-2xl font-bold">Verification Failed</h2>
+                <h1 className="text-2xl font-bold">Verification Failed</h1>
                 <p className="text-muted-foreground">
                   {errorMessage}
                 </p>

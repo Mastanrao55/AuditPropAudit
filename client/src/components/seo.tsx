@@ -217,5 +217,80 @@ export const seoData = {
     title: "Page Not Found",
     description: "The page you're looking for doesn't exist. Navigate back to AssetzAudit home or dashboard.",
     keywords: "404, page not found, error"
+  },
+  forgotPassword: {
+    title: "Forgot Password",
+    description: "Reset your AssetzAudit account password. Enter your email to receive a secure password reset link.",
+    keywords: "forgot password, reset password, account recovery, AssetzAudit login"
+  },
+  resetPassword: {
+    title: "Reset Password",
+    description: "Create a new password for your AssetzAudit account. Secure your access to property verification tools.",
+    keywords: "reset password, new password, account security, AssetzAudit"
+  },
+  verifyEmail: {
+    title: "Verify Email",
+    description: "Verify your email address to activate your AssetzAudit account and access property due-diligence tools.",
+    keywords: "email verification, account activation, AssetzAudit signup"
+  },
+  nri: {
+    title: "NRI Property Compliance",
+    description: "Complete NRI compliance verification with FEMA regulations, tax residency checks, and foreign remittance documentation for Indian property investments.",
+    keywords: "NRI compliance, FEMA regulations, NRI property India, tax residency verification"
+  },
+  documentVerification: {
+    title: "Document Verification",
+    description: "AI-powered document verification for property transactions. Validate sale deeds, title documents, encumbrance certificates, and legal agreements.",
+    keywords: "document verification, property documents, sale deed verification, AI document analysis"
+  },
+  propertyDetails: {
+    title: "Property Details",
+    description: "Comprehensive property audit report with ownership history, legal status, financial encumbrances, and risk assessment.",
+    keywords: "property details, audit report, property verification, risk assessment"
+  },
+  propertyValuation: {
+    title: "Property Valuation",
+    description: "Data-driven property valuation with market comparables, locality trends, and investment potential analysis for Indian real estate.",
+    keywords: "property valuation, market value, real estate pricing, investment analysis"
+  },
+  settings: {
+    title: "Account Settings",
+    description: "Manage your AssetzAudit account settings, preferences, and notification options.",
+    keywords: "account settings, preferences, notifications, AssetzAudit account"
+  },
+  admin: {
+    title: "Admin Dashboard",
+    description: "Administrative dashboard for managing users, audits, and platform operations on AssetzAudit.",
+    keywords: "admin dashboard, user management, platform administration"
+  },
+  auditor: {
+    title: "Auditor Dashboard",
+    description: "Auditor workspace for reviewing property verification requests and completing due-diligence assessments.",
+    keywords: "auditor dashboard, property review, verification assessment"
+  },
+  reviewQueue: {
+    title: "Review Queue",
+    description: "Pending property audits and verification requests awaiting review and approval.",
+    keywords: "review queue, pending audits, verification requests"
+  },
+  auditReports: {
+    title: "Audit Reports",
+    description: "Download and manage your completed property audit reports with comprehensive verification details.",
+    keywords: "audit reports, property reports, verification documents, download reports"
+  },
+  verificationHub: {
+    title: "Verification Hub",
+    description: "Central hub for all property verification activities including document review, compliance checks, and audit tracking.",
+    keywords: "verification hub, property verification, compliance tracking"
+  },
+  developerAudit: {
+    title: "Developer Audit Dashboard",
+    description: "RERA Form 7 compliance tracking and developer audit tools for real estate project verification.",
+    keywords: "developer audit, RERA Form 7, project compliance, builder verification"
+  },
+  comprehensiveDashboard: {
+    title: "Comprehensive Features",
+    description: "Explore all AssetzAudit features including fraud detection, title verification, RERA compliance, and market intelligence.",
+    keywords: "AssetzAudit features, property verification tools, comprehensive audit"
   }
 };

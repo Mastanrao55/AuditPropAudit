@@ -45,9 +45,9 @@ export function SEO({
     updateMetaTag("og:type", ogType, true);
     if (ogImage) updateMetaTag("og:image", ogImage, true);
     
-    updateMetaTag("twitter:title", fullTitle, true);
-    updateMetaTag("twitter:description", description, true);
-    if (ogImage) updateMetaTag("twitter:image", ogImage, true);
+    updateMetaTag("twitter:title", fullTitle, false);
+    updateMetaTag("twitter:description", description, false);
+    if (ogImage) updateMetaTag("twitter:image", ogImage, false);
 
     if (canonicalUrl) {
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;

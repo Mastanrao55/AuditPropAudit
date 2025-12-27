@@ -88,6 +88,176 @@ async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // =====================
+  // SEO ROUTES (MUST BE FIRST - before any middleware)
+  // These routes serve sitemap.xml and robots.txt for search engines
+  // =====================
+  
+  // Sitemap.xml - Dynamic sitemap for search engines
+  app.get("/sitemap.xml", (req, res) => {
+    const baseUrl = "https://assetzaudit.com";
+    const today = new Date().toISOString().split("T")[0];
+
+    const staticPages = [
+      { loc: "/", priority: "1.0", changefreq: "daily" },
+      { loc: "/dashboard", priority: "0.9", changefreq: "daily" },
+      { loc: "/solutions", priority: "0.8", changefreq: "weekly" },
+      { loc: "/nri-solutions", priority: "0.8", changefreq: "weekly" },
+      { loc: "/pricing", priority: "0.8", changefreq: "weekly" },
+      { loc: "/data-sources", priority: "0.7", changefreq: "monthly" },
+      { loc: "/api", priority: "0.7", changefreq: "monthly" },
+      { loc: "/contact", priority: "0.7", changefreq: "monthly" },
+      { loc: "/blog", priority: "0.8", changefreq: "daily" },
+      { loc: "/news", priority: "0.7", changefreq: "daily" },
+      { loc: "/sign-in", priority: "0.5", changefreq: "monthly" },
+      { loc: "/sign-up", priority: "0.5", changefreq: "monthly" },
+      { loc: "/fraud", priority: "0.8", changefreq: "weekly" },
+      { loc: "/title", priority: "0.8", changefreq: "weekly" },
+      { loc: "/ec", priority: "0.8", changefreq: "weekly" },
+      { loc: "/rera", priority: "0.8", changefreq: "weekly" },
+      { loc: "/litigation", priority: "0.8", changefreq: "weekly" },
+      { loc: "/market", priority: "0.8", changefreq: "weekly" },
+      { loc: "/valuation", priority: "0.7", changefreq: "weekly" },
+      { loc: "/documents", priority: "0.7", changefreq: "weekly" },
+      { loc: "/nri", priority: "0.7", changefreq: "weekly" },
+      { loc: "/features", priority: "0.7", changefreq: "weekly" },
+      { loc: "/developer-audit", priority: "0.7", changefreq: "weekly" },
+      { loc: "/verification", priority: "0.6", changefreq: "weekly" },
+      { loc: "/html-sitemap", priority: "0.5", changefreq: "monthly" },
+    ];
+
+    const blogSlugs = [
+      "property-fraud-detection",
+      "encumbrance-certificate-guide",
+      "title-verification-guide",
+      "due-diligence-checklist",
+      "litigation-risks-real-estate",
+      "nri-property-guide",
+      "rera-compliance-guide",
+      "market-intelligence-guide",
+    ];
+
+    const blogUrls = blogSlugs.map(slug => ({
+      loc: `/blog/${slug}`,
+      priority: "0.7",
+      changefreq: "monthly",
+    }));
+
+    const allPages = [...staticPages, ...blogUrls];
+
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+${allPages.map(page => `  <url>
+    <loc>${baseUrl}${page.loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+
+    res.type("application/xml");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.set("X-Content-Type-Options", "nosniff");
+    res.send(sitemap);
+  });
+
+  // Robots.txt - Must be before other middleware
+  app.get("/robots.txt", (req, res) => {
+    const baseUrl = "https://assetzaudit.com";
+
+    const robotsTxt = `# AssetzAudit Robots.txt
+# Last updated: ${new Date().toISOString().split("T")[0]}
+
+# Allow all search engine crawlers
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auditor
+Disallow: /auditor/
+Disallow: /verification
+Disallow: /review
+Disallow: /reports
+Disallow: /settings
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /api/
+
+# Crawl delay for general bots
+Crawl-delay: 1
+
+# Googlebot specific rules
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auditor
+Disallow: /verification
+Disallow: /review
+Disallow: /reports
+Disallow: /settings
+Disallow: /api/
+
+# Bingbot specific rules
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /auditor
+Disallow: /verification
+Disallow: /review
+Disallow: /reports
+Disallow: /settings
+Disallow: /api/
+Crawl-delay: 2
+
+# Block AI training bots
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# Sitemap location
+Sitemap: ${baseUrl}/sitemap.xml`;
+
+    res.type("text/plain");
+    res.set("Cache-Control", "public, max-age=86400");
+    res.set("X-Content-Type-Options", "nosniff");
+    res.send(robotsTxt);
+  });
+
   // Session configuration
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
@@ -1144,177 +1314,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error generating document:", error);
       res.status(500).json({ error: "Failed to generate document" });
     }
-  });
-
-  // =====================
-  // SEO & BOT ROUTES
-  // =====================
-
-  // Sitemap.xml - Dynamic sitemap for search engines
-  app.get("/sitemap.xml", (req, res) => {
-    const baseUrl = "https://assetzaudit.com";
-    const today = new Date().toISOString().split("T")[0];
-
-    // Static pages with priority and change frequency
-    const staticPages = [
-      { loc: "/", priority: "1.0", changefreq: "daily" },
-      { loc: "/dashboard", priority: "0.9", changefreq: "daily" },
-      { loc: "/solutions", priority: "0.8", changefreq: "weekly" },
-      { loc: "/nri-solutions", priority: "0.8", changefreq: "weekly" },
-      { loc: "/pricing", priority: "0.8", changefreq: "weekly" },
-      { loc: "/data-sources", priority: "0.7", changefreq: "monthly" },
-      { loc: "/api", priority: "0.7", changefreq: "monthly" },
-      { loc: "/contact", priority: "0.7", changefreq: "monthly" },
-      { loc: "/blog", priority: "0.8", changefreq: "daily" },
-      { loc: "/news", priority: "0.7", changefreq: "daily" },
-      { loc: "/sign-in", priority: "0.5", changefreq: "monthly" },
-      { loc: "/sign-up", priority: "0.5", changefreq: "monthly" },
-      // Feature pages
-      { loc: "/fraud", priority: "0.8", changefreq: "weekly" },
-      { loc: "/title", priority: "0.8", changefreq: "weekly" },
-      { loc: "/ec", priority: "0.8", changefreq: "weekly" },
-      { loc: "/rera", priority: "0.8", changefreq: "weekly" },
-      { loc: "/litigation", priority: "0.8", changefreq: "weekly" },
-      { loc: "/market", priority: "0.8", changefreq: "weekly" },
-      { loc: "/valuation", priority: "0.7", changefreq: "weekly" },
-      { loc: "/documents", priority: "0.7", changefreq: "weekly" },
-      { loc: "/nri", priority: "0.7", changefreq: "weekly" },
-      { loc: "/features", priority: "0.7", changefreq: "weekly" },
-      { loc: "/developer-audit", priority: "0.7", changefreq: "weekly" },
-      { loc: "/verification", priority: "0.6", changefreq: "weekly" },
-      { loc: "/html-sitemap", priority: "0.5", changefreq: "monthly" },
-    ];
-
-    // Blog article slugs
-    const blogSlugs = [
-      "property-fraud-detection",
-      "encumbrance-certificate-guide",
-      "title-verification-guide",
-      "due-diligence-checklist",
-      "litigation-risks-real-estate",
-      "nri-property-guide",
-      "rera-compliance-guide",
-      "market-intelligence-guide",
-    ];
-
-    const blogUrls = blogSlugs.map(slug => ({
-      loc: `/blog/${slug}`,
-      priority: "0.7",
-      changefreq: "monthly",
-    }));
-
-    const allPages = [...staticPages, ...blogUrls];
-
-    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-${allPages.map(page => `  <url>
-    <loc>${baseUrl}${page.loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
-  </url>`).join("\n")}
-</urlset>`;
-
-    res.setHeader("Content-Type", "application/xml");
-    res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
-    res.send(sitemap);
-  });
-
-  // Robots.txt - Optimized for search engines and AI bots
-  app.get("/robots.txt", (req, res) => {
-    const baseUrl = "https://assetzaudit.com";
-
-    const robotsTxt = `# AssetzAudit Robots.txt
-# Last updated: ${new Date().toISOString().split("T")[0]}
-
-# Allow all search engine crawlers
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /admin/
-Disallow: /auditor
-Disallow: /auditor/
-Disallow: /verification
-Disallow: /review
-Disallow: /reports
-Disallow: /settings
-Disallow: /forgot-password
-Disallow: /reset-password
-Disallow: /verify-email
-Disallow: /api/
-
-# Crawl delay for general bots (Google ignores this)
-Crawl-delay: 1
-
-# Googlebot specific rules
-User-agent: Googlebot
-Allow: /
-Disallow: /admin
-Disallow: /admin/
-Disallow: /auditor
-Disallow: /verification
-Disallow: /review
-Disallow: /reports
-Disallow: /settings
-Disallow: /api/
-
-# Bingbot specific rules
-User-agent: Bingbot
-Allow: /
-Disallow: /admin
-Disallow: /admin/
-Disallow: /auditor
-Disallow: /verification
-Disallow: /review
-Disallow: /reports
-Disallow: /settings
-Disallow: /api/
-Crawl-delay: 2
-
-# Block AI training bots to protect content
-User-agent: GPTBot
-Disallow: /
-
-User-agent: ChatGPT-User
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: anthropic-ai
-Disallow: /
-
-User-agent: Claude-Web
-Disallow: /
-
-User-agent: Google-Extended
-Disallow: /
-
-User-agent: FacebookBot
-Disallow: /
-
-User-agent: Bytespider
-Disallow: /
-
-User-agent: Amazonbot
-Disallow: /
-
-User-agent: Omgilibot
-Disallow: /
-
-User-agent: Diffbot
-Disallow: /
-
-# Sitemap location
-Sitemap: ${baseUrl}/sitemap.xml
-`;
-
-    res.setHeader("Content-Type", "text/plain");
-    res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 24 hours
-    res.send(robotsTxt);
   });
 
   const httpServer = createServer(app);

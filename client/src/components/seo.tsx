@@ -7,6 +7,7 @@ interface SEOProps {
   canonicalUrl?: string;
   ogType?: string;
   ogImage?: string;
+  structuredData?: object;
 }
 
 export function SEO({
@@ -15,7 +16,8 @@ export function SEO({
   keywords,
   canonicalUrl,
   ogType = "website",
-  ogImage = "https://replit.com/public/images/opengraph.png"
+  ogImage = "https://replit.com/public/images/opengraph.png",
+  structuredData
 }: SEOProps) {
   useEffect(() => {
     const fullTitle = title.includes("AssetzAudit") ? title : `${title} | AssetzAudit`;
@@ -59,10 +61,23 @@ export function SEO({
       link.href = canonicalUrl;
     }
 
+    if (structuredData) {
+      let script = document.querySelector('script[data-seo-structured]') as HTMLScriptElement;
+      if (!script) {
+        script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.setAttribute("data-seo-structured", "true");
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(structuredData);
+    }
+
     return () => {
       document.title = "AssetzAudit — 360° Property Due-Diligence";
+      const structuredScript = document.querySelector('script[data-seo-structured]');
+      if (structuredScript) structuredScript.remove();
     };
-  }, [title, description, keywords, canonicalUrl, ogType, ogImage]);
+  }, [title, description, keywords, canonicalUrl, ogType, ogImage, structuredData]);
 
   return null;
 }
@@ -71,7 +86,47 @@ export const seoData = {
   home: {
     title: "AssetzAudit — 360° Property Due-Diligence Platform",
     description: "Enterprise-grade property audit platform for Indian real estate. Verified identity checks, financial encumbrances, legal history, fraud detection, and comprehensive risk scoring.",
-    keywords: "property verification, real estate due diligence, property fraud detection, encumbrance certificate, title verification, RERA compliance, property audit India"
+    keywords: "property verification, real estate due diligence, property fraud detection, encumbrance certificate, title verification, RERA compliance, property audit India",
+    structuredData: {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "AssetzAudit",
+          "description": "360° Property Due-Diligence Platform for Indian Real Estate",
+          "url": "https://assetzaudit.com",
+          "logo": "https://assetzaudit.com/logo.png",
+          "sameAs": [],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "email": "contact@assetzaudit.com"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "name": "AssetzAudit",
+          "url": "https://assetzaudit.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://assetzaudit.com/dashboard?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "AssetzAudit",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "description": "Property verification and due-diligence platform for Indian real estate",
+          "offers": {
+            "@type": "Offer",
+            "price": "999",
+            "priceCurrency": "INR"
+          }
+        }
+      ]
+    }
   },
   dashboard: {
     title: "Dashboard",

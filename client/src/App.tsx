@@ -40,6 +40,7 @@ import ECDashboard from "@/pages/ec-dashboard";
 import PropertyValuation from "@/pages/property-valuation";
 import Blog from "@/pages/blog";
 import BlogArticle from "@/pages/blog-article";
+import HTMLSitemap from "@/pages/html-sitemap";
 
 function Router() {
   return (
@@ -79,6 +80,7 @@ function Router() {
       <Route path="/news" component={News} />
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogArticle} />
+      <Route path="/html-sitemap" component={HTMLSitemap} />
       <Route component={NotFound} />
     </Switch>
   );

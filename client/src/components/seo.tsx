@@ -292,5 +292,10 @@ export const seoData = {
     title: "Comprehensive Features",
     description: "Explore all AssetzAudit features including fraud detection, title verification, RERA compliance, and market intelligence.",
     keywords: "AssetzAudit features, property verification tools, comprehensive audit"
+  },
+  htmlSitemap: {
+    title: "HTML Sitemap",
+    description: "Complete directory of all pages on AssetzAudit - India's leading property due-diligence platform. Find property verification, legal checks, and more.",
+    keywords: "sitemap, AssetzAudit pages, property verification sitemap, due diligence directory"
   }
 };

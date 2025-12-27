@@ -1180,6 +1180,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { loc: "/documents", priority: "0.7", changefreq: "weekly" },
       { loc: "/nri", priority: "0.7", changefreq: "weekly" },
       { loc: "/features", priority: "0.7", changefreq: "weekly" },
+      { loc: "/developer-audit", priority: "0.7", changefreq: "weekly" },
+      { loc: "/verification", priority: "0.6", changefreq: "weekly" },
+      { loc: "/html-sitemap", priority: "0.5", changefreq: "monthly" },
     ];
 
     // Blog article slugs

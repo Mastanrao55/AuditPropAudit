@@ -2,10 +2,12 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Building2, Users, Shield, TrendingUp, CheckCircle2 } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 export default function Solutions() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.solutions} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">

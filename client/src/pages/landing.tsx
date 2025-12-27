@@ -5,6 +5,7 @@ import { ArrowRight, ShieldCheck, Search, Building2, Download, Menu, X } from "l
 import generatedImage from "@assets/generated_images/abstract_blue_data_map_background.png";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { SEO, seoData } from "@/components/seo";
 
 export default function LandingPage() {
   const { toast } = useToast();
@@ -58,6 +59,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.home} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">

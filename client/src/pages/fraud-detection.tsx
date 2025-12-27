@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { SEO, seoData } from "@/components/seo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -246,6 +247,7 @@ export default function FraudDetection() {
 
   return (
     <Layout>
+      <SEO {...seoData.fraudDetection} />
       <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

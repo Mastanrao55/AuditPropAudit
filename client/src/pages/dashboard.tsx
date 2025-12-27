@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { SEO, seoData } from "@/components/seo";
 
 export default function Dashboard() {
   const [location, setLocation] = useLocation();
@@ -180,6 +181,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <SEO {...seoData.dashboard} />
       <div className="space-y-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

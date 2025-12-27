@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { SEO, seoData } from "@/components/seo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -245,6 +246,7 @@ export default function RERADashboard() {
 
   return (
     <Layout>
+      <SEO {...seoData.reraDashboard} />
       <div className="min-h-screen bg-background">
         {/* Header */}
         <div className="border-b border-border bg-card">

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Send, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SEO, seoData } from "@/components/seo";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -68,6 +69,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.contact} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">

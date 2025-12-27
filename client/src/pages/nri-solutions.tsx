@@ -2,10 +2,12 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Globe, Building2, Shield, TrendingUp, CheckCircle2, MapPin, DollarSign, BookOpen, Lock } from "lucide-react";
+import { SEO, seoData } from "@/components/seo";
 
 export default function NRISolutions() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.nriSolutions} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">

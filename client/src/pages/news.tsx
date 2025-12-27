@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, ExternalLink, Loader2 } from "lucide-react";
 import type { NewsArticle } from "@shared/schema";
+import { SEO, seoData } from "@/components/seo";
 
 export default function News() {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
@@ -60,6 +61,7 @@ export default function News() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.news} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">

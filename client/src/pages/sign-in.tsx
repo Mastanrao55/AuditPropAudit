@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
+import { SEO, seoData } from "@/components/seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -209,6 +210,7 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <SEO {...seoData.signIn} />
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">

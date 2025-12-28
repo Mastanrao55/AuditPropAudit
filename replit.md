@@ -71,7 +71,7 @@ Preferred communication style: Simple, everyday language.
 - Drizzle ORM configured as the database toolkit
 - Schema defined in `shared/schema.ts` with type-safe query builders
 - Migration output directory: `./migrations`
-- Connection via `@neondatabase/serverless` driver (serverless-compatible)
+- Connection via `pg` driver (standard PostgreSQL)
 
 **Current State**
 - In-memory storage implementation active for rapid prototyping
@@ -112,7 +112,7 @@ Preferred communication style: Simple, everyday language.
 - **Utilities**: date-fns for date formatting, nanoid for ID generation, Lucide React for icons
 
 **Backend Dependencies**
-- **Database**: Drizzle ORM, Neon serverless PostgreSQL driver
+- **Database**: Drizzle ORM, Supabase PostgreSQL with `pg` driver
 - **Session**: connect-pg-simple for PostgreSQL-backed sessions
 - **Server**: Express.js with TypeScript support via tsx
 

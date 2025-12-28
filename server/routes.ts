@@ -2,8 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { storage } from "./storage";
-import { pool } from "./db";
+import { storage } from "./src/repositories/storage.repo";
+import { pool } from "./src/db";
 import { 
   insertContactMessageSchema, 
   insertUserSchema, 
@@ -11,79 +11,31 @@ import {
   insertUserPropertySchema, 
   insertNRIChecklistSchema,
   insertPropertyArchiveSchema,
-  registerUserSchema,
-  loginUserSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-  verifyEmailSchema,
-  requestOTPSchema,
-  verifyOTPSchema,
   type NewsArticle 
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { Document, Packer, Paragraph, HeadingLevel } from "docx";
-import * as auth from "./auth";
-import { sendVerificationEmail, sendPasswordResetEmail, sendOTPEmail } from "./email";
-import { sendOTPSMS } from "./sms";
+import { getSessionSecret, isProduction } from "./src/config/env";
+import { fetchNewsFromAPI } from "./src/services/news.service";
+import {
+  registerController,
+  loginController,
+  logoutController,
+  getCurrentUserController,
+  verifyEmailController,
+  resendVerificationController,
+  forgotPasswordController,
+  resetPasswordController,
+  requestOTPController,
+  verifyOTPController,
+  requestEmailOTPController,
+} from "./src/controllers/auth.controller";
 
 declare module "express-session" {
   interface SessionData {
     userId?: string;
     email?: string;
     role?: string;
-  }
-}
-
-const NEWS_SOURCES = [
-  { name: "Real Estate", keywords: "real estate property market housing" },
-  { name: "Legal", keywords: "legal law court regulation" },
-  { name: "Finance", keywords: "finance financial investment banking" },
-  { name: "Banking", keywords: "banking bank loans credit" },
-  { name: "Fraud", keywords: "fraud forgery document crime" },
-];
-
-async function fetchNewsFromAPI(query: string): Promise<NewsArticle[]> {
-  try {
-    const articles: NewsArticle[] = [];
-    
-    const mockNews: Record<string, NewsArticle[]> = {
-      "real estate": [
-        {
-          id: "1",
-          title: "Property Market Shows Strong Recovery in Q4 2025",
-          description: "Real estate sector demonstrates resilience with 12% growth in transaction volumes.",
-          source: "Real Estate Daily",
-          url: "https://example.com/realestate1",
-          publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Real Estate",
-        },
-      ],
-      "legal": [
-        {
-          id: "3",
-          title: "Supreme Court Ruling Impacts Property Disputes",
-          description: "Landmark decision clarifies ownership transfer procedures in contested cases.",
-          source: "Legal Times",
-          url: "https://example.com/legal1",
-          publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          category: "Legal",
-        },
-      ],
-    };
-
-    const lowerQuery = query.toLowerCase();
-    for (const [key, newsList] of Object.entries(mockNews)) {
-      if (!query || lowerQuery.includes(key)) {
-        articles.push(...newsList);
-      }
-    }
-
-    return articles.sort((a, b) => 
-      new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
-  } catch (error) {
-    console.error("Error fetching news:", error);
-    return [];
   }
 }
 
@@ -258,22 +210,24 @@ Sitemap: ${baseUrl}/sitemap.xml`;
     res.send(robotsTxt);
   });
 
-  // Session configuration
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    pool,
-    createTableIfMissing: true,
-    tableName: "sessions",
-  });
+ // Session configuration
+const pgStore = connectPg(session);
+const sessionStore = new pgStore({
+  pool: pool,
+  tableName: "sessions",
+  createTableIfMissing: true,
+  // Add this to prevent frequent cleanup queries from eating connections
+  // pruneSessionInterval: 900, // Prune every 15 minutes instead of every minute
+});
 
   app.use(
     session({
       store: sessionStore,
-      secret: process.env.SESSION_SECRET || "assetzaudit-dev-secret-change-in-production",
+      secret: getSessionSecret(),
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction(),
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       },
@@ -293,323 +247,37 @@ Sitemap: ${baseUrl}/sitemap.xml`;
   // =====================
 
   // Register new user
-  app.post("/api/auth/register", async (req, res) => {
-    try {
-      const data = registerUserSchema.parse(req.body);
-      
-      const existingUser = await auth.getUserByEmail(data.email);
-      if (existingUser) {
-        return res.status(400).json({ error: "Email already registered" });
-      }
-      
-      const user = await auth.createUser({
-        email: data.email,
-        password: data.password,
-        fullName: data.fullName,
-        phoneNumber: data.phoneNumber,
-      });
-      
-      const token = await auth.createEmailVerificationToken(user.id);
-      await sendVerificationEmail(user.email!, token);
-      
-      res.json({ 
-        success: true, 
-        message: "Registration successful. Please check your email to verify your account.",
-        userId: user.id 
-      });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      console.error("Registration error:", error);
-      res.status(500).json({ error: "Registration failed" });
-    }
-  });
+  app.post("/api/auth/register", registerController);
 
   // Login with email/password
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const data = loginUserSchema.parse(req.body);
-      
-      const user = await auth.getUserByEmail(data.email);
-      if (!user || !user.hashedPassword) {
-        return res.status(401).json({ error: "Invalid email or password" });
-      }
-      
-      const isValid = await auth.verifyPassword(data.password, user.hashedPassword);
-      if (!isValid) {
-        return res.status(401).json({ error: "Invalid email or password" });
-      }
-      
-      if (!user.emailVerified) {
-        return res.status(403).json({ 
-          error: "Please verify your email before logging in",
-          requiresVerification: true 
-        });
-      }
-      
-      if (user.status !== "active") {
-        return res.status(403).json({ error: "Your account has been suspended" });
-      }
-      
-      await auth.updateLastLogin(user.id);
-      
-      req.session.userId = user.id;
-      req.session.email = user.email!;
-      req.session.role = user.role;
-      
-      res.json({ 
-        success: true, 
-        user: {
-          id: user.id,
-          email: user.email,
-          fullName: user.fullName,
-          role: user.role,
-          emailVerified: user.emailVerified,
-          phoneVerified: user.phoneVerified,
-        }
-      });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      console.error("Login error:", error);
-      res.status(500).json({ error: "Login failed" });
-    }
-  });
+  app.post("/api/auth/login", loginController);
 
   // Logout
-  app.post("/api/auth/logout", (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ error: "Logout failed" });
-      }
-      res.clearCookie("connect.sid");
-      res.json({ success: true });
-    });
-  });
+  app.post("/api/auth/logout", logoutController);
 
   // Get current user
-  app.get("/api/auth/user", async (req, res) => {
-    if (!req.session.userId) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-    
-    const user = await auth.getUserById(req.session.userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    
-    res.json({
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role,
-      emailVerified: user.emailVerified,
-      phoneVerified: user.phoneVerified,
-    });
-  });
+  app.get("/api/auth/user", getCurrentUserController);
 
   // Verify email
-  app.post("/api/auth/verify-email", async (req, res) => {
-    try {
-      const { token } = verifyEmailSchema.parse(req.body);
-      const result = await auth.verifyEmailToken(token);
-      
-      if (!result.success) {
-        return res.status(400).json({ error: result.error });
-      }
-      
-      res.json({ success: true, message: "Email verified successfully" });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      res.status(500).json({ error: "Verification failed" });
-    }
-  });
+  app.post("/api/auth/verify-email", verifyEmailController);
 
   // Resend verification email
-  app.post("/api/auth/resend-verification", async (req, res) => {
-    try {
-      const { email } = req.body;
-      if (!email) {
-        return res.status(400).json({ error: "Email is required" });
-      }
-      
-      const user = await auth.getUserByEmail(email);
-      if (!user) {
-        return res.json({ success: true, message: "If the email exists, a verification link has been sent" });
-      }
-      
-      if (user.emailVerified) {
-        return res.status(400).json({ error: "Email is already verified" });
-      }
-      
-      const token = await auth.createEmailVerificationToken(user.id);
-      await sendVerificationEmail(user.email!, token);
-      
-      res.json({ success: true, message: "Verification email sent" });
-    } catch (error) {
-      console.error("Resend verification error:", error);
-      res.status(500).json({ error: "Failed to resend verification email" });
-    }
-  });
+  app.post("/api/auth/resend-verification", resendVerificationController);
 
   // Forgot password
-  app.post("/api/auth/forgot-password", async (req, res) => {
-    try {
-      const { email } = forgotPasswordSchema.parse(req.body);
-      
-      const user = await auth.getUserByEmail(email);
-      if (user) {
-        const token = await auth.createPasswordResetToken(user.id);
-        await sendPasswordResetEmail(user.email!, token);
-      }
-      
-      res.json({ 
-        success: true, 
-        message: "If an account exists with this email, a password reset link has been sent" 
-      });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      res.status(500).json({ error: "Failed to process request" });
-    }
-  });
+  app.post("/api/auth/forgot-password", forgotPasswordController);
 
   // Reset password
-  app.post("/api/auth/reset-password", async (req, res) => {
-    try {
-      const { token, password } = resetPasswordSchema.parse(req.body);
-      const result = await auth.resetPasswordWithToken(token, password);
-      
-      if (!result.success) {
-        return res.status(400).json({ error: result.error });
-      }
-      
-      res.json({ success: true, message: "Password reset successfully" });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      res.status(500).json({ error: "Failed to reset password" });
-    }
-  });
-
-  // OTP request rate limiting (in-memory, per phone number)
-  const otpRequestCounts = new Map<string, { count: number; resetAt: number }>();
-  const OTP_RATE_LIMIT = 3; // Max requests per window
-  const OTP_RATE_WINDOW = 5 * 60 * 1000; // 5 minutes
+  app.post("/api/auth/reset-password", resetPasswordController);
 
   // Request OTP (SMS)
-  app.post("/api/auth/otp/request", async (req, res) => {
-    try {
-      const { phoneNumber } = requestOTPSchema.parse(req.body);
-      
-      // Rate limiting check
-      const now = Date.now();
-      const rateData = otpRequestCounts.get(phoneNumber);
-      
-      if (rateData) {
-        if (now < rateData.resetAt) {
-          if (rateData.count >= OTP_RATE_LIMIT) {
-            const minutesLeft = Math.ceil((rateData.resetAt - now) / 60000);
-            return res.status(429).json({ 
-              error: `Too many OTP requests. Please try again in ${minutesLeft} minute(s).` 
-            });
-          }
-          rateData.count++;
-        } else {
-          rateData.count = 1;
-          rateData.resetAt = now + OTP_RATE_WINDOW;
-        }
-      } else {
-        otpRequestCounts.set(phoneNumber, { count: 1, resetAt: now + OTP_RATE_WINDOW });
-      }
-      
-      const user = await auth.getUserByPhone(phoneNumber);
-      const { otp } = await auth.createOTPChallenge(phoneNumber, "sms", user?.id);
-      
-      const result = await sendOTPSMS(phoneNumber, otp);
-      if (!result.success) {
-        return res.status(500).json({ error: "Failed to send OTP" });
-      }
-      
-      res.json({ success: true, message: "OTP sent successfully" });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      console.error("OTP request error:", error);
-      res.status(500).json({ error: "Failed to send OTP" });
-    }
-  });
+  app.post("/api/auth/otp/request", requestOTPController);
 
   // Verify OTP and login
-  app.post("/api/auth/otp/verify", async (req, res) => {
-    try {
-      const { phoneNumber, code } = verifyOTPSchema.parse(req.body);
-      const result = await auth.verifyOTP(phoneNumber, code);
-      
-      if (!result.success) {
-        return res.status(400).json({ error: result.error });
-      }
-      
-      if (result.userId) {
-        const user = await auth.getUserById(result.userId);
-        if (user) {
-          req.session.userId = user.id;
-          req.session.email = user.email!;
-          req.session.role = user.role;
-          
-          return res.json({ 
-            success: true, 
-            isNewUser: false,
-            user: {
-              id: user.id,
-              email: user.email,
-              fullName: user.fullName,
-              role: user.role,
-            }
-          });
-        }
-      }
-      
-      res.json({ 
-        success: true, 
-        isNewUser: true,
-        message: "OTP verified. Please complete registration.",
-        phoneNumber 
-      });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({ error: error.errors[0].message });
-      }
-      res.status(500).json({ error: "OTP verification failed" });
-    }
-  });
+  app.post("/api/auth/otp/verify", verifyOTPController);
 
   // Request Email OTP
-  app.post("/api/auth/email-otp/request", async (req, res) => {
-    try {
-      const { email } = req.body;
-      if (!email) {
-        return res.status(400).json({ error: "Email is required" });
-      }
-      
-      const user = await auth.getUserByEmail(email);
-      const { otp } = await auth.createOTPChallenge(email, "email", user?.id);
-      
-      await sendOTPEmail(email, otp);
-      
-      res.json({ success: true, message: "OTP sent to your email" });
-    } catch (error) {
-      console.error("Email OTP request error:", error);
-      res.status(500).json({ error: "Failed to send OTP" });
-    }
-  });
+  app.post("/api/auth/email-otp/request", requestEmailOTPController);
 
   // =====================
   // EXISTING ROUTES

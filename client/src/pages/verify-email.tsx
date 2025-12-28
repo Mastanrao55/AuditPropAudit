@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { SEO, seoData } from "@/components/seo";
 export default function VerifyEmail() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [errorMessage, setErrorMessage] = useState("");
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { verifyEmail } = useAuth();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function VerifyEmail() {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO {...seoData.verifyEmail} />
       <header className="container mx-auto px-4 py-6">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -71,7 +71,7 @@ export default function VerifyEmail() {
                   Your email has been successfully verified. You can now sign in to your account.
                 </p>
                 <div className="pt-4">
-                  <Link href="/sign-in">
+                  <Link to="/sign-in">
                     <Button className="w-full" data-testid="button-goto-signin">
                       Go to Sign In
                     </Button>
@@ -90,7 +90,7 @@ export default function VerifyEmail() {
                   {errorMessage}
                 </p>
                 <div className="pt-4 space-y-3">
-                  <Link href="/sign-in">
+                  <Link to="/sign-in">
                     <Button variant="outline" className="w-full" data-testid="button-goto-signin">
                       Go to Sign In
                     </Button>

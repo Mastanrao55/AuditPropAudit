@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout";
-import { useRoute } from "wouter";
+import { useParams } from "react-router-dom";
 import { MOCK_PROPERTIES, formatCurrency, RiskLevel } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,8 +28,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 export default function PropertyDetails() {
-  const [, params] = useRoute("/property/:id");
-  const property = MOCK_PROPERTIES.find(p => p.id === params?.id);
+  const { id } = useParams<{ id: string }>();
+  const property = MOCK_PROPERTIES.find(p => p.id === id);
   const { toast } = useToast();
 
   if (!property) {

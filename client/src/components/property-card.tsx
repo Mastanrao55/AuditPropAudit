@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { ArrowRight, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -58,7 +58,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
       <CardFooter className="p-4 bg-muted/30 flex justify-between items-center">
         <span className="text-xs text-muted-foreground">Last audited: {new Date(property.lastAudited).toLocaleDateString()}</span>
         <Button size="sm" variant="outline" className="gap-2 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all" asChild>
-          <Link href={`/property/${property.id}`}>
+          <Link to={`/property/${property.id}`}>
             Full Audit <ArrowRight className="w-3 h-3" />
           </Link>
         </Button>

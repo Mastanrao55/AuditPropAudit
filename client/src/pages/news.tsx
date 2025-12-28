@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,7 +64,7 @@ export default function News() {
       <SEO {...seoData.news} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -73,7 +73,7 @@ export default function News() {
           </div>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/">
+          <Link to="/">
             <Button variant="ghost">Back Home</Button>
           </Link>
         </div>

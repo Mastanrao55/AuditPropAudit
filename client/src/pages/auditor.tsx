@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/store/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 

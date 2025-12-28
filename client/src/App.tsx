@@ -1,9 +1,13 @@
-import { Switch, Route } from "wouter";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { Provider } from "react-redux";
+import { store } from "@/store";
+import { useEffect } from "react";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PublicRoute } from "@/components/PublicRoute";
 import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
@@ -42,60 +46,286 @@ import Blog from "@/pages/blog";
 import BlogArticle from "@/pages/blog-article";
 import HTMLSitemap from "@/pages/html-sitemap";
 
-function Router() {
+// Component to sync localStorage with server session on mount
+// Server session is the source of truth - localStorage is just a backup
+function AuthRestorer() {
+  useEffect(() => {
+    // Validate server session and sync localStorage on mount
+    const syncAuthState = async () => {
+      try {
+        const response = await fetch("/api/auth/user", {
+          credentials: "include",
+        });
+        
+        if (response.ok) {
+          const user = await response.json();
+          // Update localStorage with server session data
+          const userData = {
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role,
+          };
+          localStorage.setItem("auth-user", JSON.stringify(userData));
+        } else if (response.status === 401) {
+          // Server session is invalid - clear localStorage
+          localStorage.removeItem("auth-user");
+        }
+      } catch (error) {
+        // Network error - keep localStorage as backup
+        // ProtectedRoute will handle validation
+        console.error("Failed to sync auth state:", error);
+      }
+    };
+
+    syncAuthState();
+  }, []); // Only run once on mount
+
+  return null;
+}
+
+function AppRoutes() {
   return (
-    <Switch>
-      <Route path="/" component={LandingPage} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/users" component={AdminUsers} />
-      <Route path="/auditor" component={AuditorDashboard} />
-      <Route path="/verification" component={VerificationHub} />
-      <Route path="/review" component={ReviewQueue} />
-      <Route path="/reports" component={AuditReports} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/nri" component={NRI} />
-      <Route path="/market" component={MarketIntelligence} />
-      <Route path="/fraud" component={FraudDetection} />
-      <Route path="/documents" component={DocumentVerification} />
-      <Route path="/litigation" component={LitigationSearch} />
-      <Route path="/title" component={TitleVerification} />
-      <Route path="/developer-audit" component={DeveloperAuditDashboard} />
-      <Route path="/rera" component={RERADashboard} />
-      <Route path="/ec" component={ECDashboard} />
-      <Route path="/valuation" component={PropertyValuation} />
-      <Route path="/features" component={ComprehensiveDashboard} />
-      <Route path="/property/:id" component={PropertyDetails} />
-      <Route path="/solutions" component={Solutions} />
-      <Route path="/nri-solutions" component={NRISolutions} />
-      <Route path="/data-sources" component={DataSources} />
-      <Route path="/pricing" component={Pricing} />
-      <Route path="/api" component={APIPage} />
-      <Route path="/sign-in" component={SignIn} />
-      <Route path="/sign-up" component={SignUp} />
-      <Route path="/forgot-password" component={ForgotPassword} />
-      <Route path="/reset-password" component={ResetPassword} />
-      <Route path="/verify-email" component={VerifyEmail} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/news" component={News} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogArticle} />
-      <Route path="/html-sitemap" component={HTMLSitemap} />
-      <Route component={NotFound} />
-    </Switch>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/news" element={<News />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogArticle />} />
+      <Route path="/html-sitemap" element={<HTMLSitemap />} />
+      <Route path="/solutions" element={<Solutions />} />
+      <Route path="/nri-solutions" element={<NRISolutions />} />
+      <Route path="/data-sources" element={<DataSources />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/api" element={<APIPage />} />
+      {/* Auth-related public routes - redirect logged-in users away */}
+      <Route
+        path="/sign-in"
+        element={
+          <PublicRoute>
+            <SignIn />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/sign-up"
+        element={
+          <PublicRoute>
+            <SignUp />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/verify-email"
+        element={
+          <PublicRoute>
+            <VerifyEmail />
+          </PublicRoute>
+        }
+      />
+
+      {/* Protected Routes - Require Authentication */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/verification"
+        element={
+          <ProtectedRoute>
+            <VerificationHub />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/review"
+        element={
+          <ProtectedRoute>
+            <ReviewQueue />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <AuditReports />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/nri"
+        element={
+          <ProtectedRoute>
+            <NRI />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/market"
+        element={
+          <ProtectedRoute>
+            <MarketIntelligence />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/fraud"
+        element={
+          <ProtectedRoute>
+            <FraudDetection />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/documents"
+        element={
+          <ProtectedRoute>
+            <DocumentVerification />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/litigation"
+        element={
+          <ProtectedRoute>
+            <LitigationSearch />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/title"
+        element={
+          <ProtectedRoute>
+            <TitleVerification />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/developer-audit"
+        element={
+          <ProtectedRoute>
+            <DeveloperAuditDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/rera"
+        element={
+          <ProtectedRoute>
+            <RERADashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ec"
+        element={
+          <ProtectedRoute>
+            <ECDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/valuation"
+        element={
+          <ProtectedRoute>
+            <PropertyValuation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/features"
+        element={
+          <ProtectedRoute>
+            <ComprehensiveDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/property/:id"
+        element={
+          <ProtectedRoute>
+            <PropertyDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin-only Routes */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminUsers />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Auditor-only Routes */}
+      <Route
+        path="/auditor"
+        element={
+          <ProtectedRoute requiredRole="auditor">
+            <AuditorDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 404 Not Found */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthRestorer />
+          <TooltipProvider>
+            <Toaster />
+            <AppRoutes />
+          </TooltipProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </Provider>
   );
 }
 

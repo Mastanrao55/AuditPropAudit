@@ -9,12 +9,12 @@ import { PropertyCard } from "@/components/property-card";
 import { MOCK_PROPERTIES, stats, formatCurrency } from "@/lib/mockData";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation, Link } from "wouter";
-import { useAuth } from "@/contexts/AuthContext";
+import { useLocation, Link } from "react-router-dom";
+import { useAuth } from "@/store/useAuth";
 import { SEO, seoData } from "@/components/seo";
 
 export default function Dashboard() {
-  const [location, setLocation] = useLocation();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [userCredits, setUserCredits] = useState({ total: 100, used: 0 });
   const [userProperties, setUserProperties] = useState<any[]>([]);
@@ -427,27 +427,27 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="flex flex-wrap gap-2">
-                    <Link href="/ec">
+                    <Link to="/ec">
                       <Button variant="outline" size="sm" className="gap-1">
                         <FileText className="h-4 w-4" /> EC Details
                       </Button>
                     </Link>
-                    <Link href="/title">
+                    <Link to="/title">
                       <Button variant="outline" size="sm" className="gap-1">
                         <Shield className="h-4 w-4" /> Title Verification
                       </Button>
                     </Link>
-                    <Link href="/litigation">
+                    <Link to="/litigation">
                       <Button variant="outline" size="sm" className="gap-1">
                         <Gavel className="h-4 w-4" /> Litigation
                       </Button>
                     </Link>
-                    <Link href="/fraud">
+                    <Link to="/fraud">
                       <Button variant="outline" size="sm" className="gap-1">
                         <AlertTriangle className="h-4 w-4" /> Fraud Analysis
                       </Button>
                     </Link>
-                    <Link href="/market">
+                    <Link to="/market">
                       <Button variant="outline" size="sm" className="gap-1">
                         <TrendingUp className="h-4 w-4" /> Market Intelligence
                       </Button>
@@ -537,37 +537,37 @@ export default function Dashboard() {
                             </div>
                             
                             <div className="flex flex-wrap gap-2 pt-2">
-                              <Link href={`/ec?propertyId=${prop.id}`}>
+                              <Link to={`/ec?propertyId=${prop.id}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <FileText className="h-3 w-3" /> EC
                                   <ChevronRight className="h-3 w-3" />
                                 </Button>
                               </Link>
-                              <Link href={`/title?propertyId=${prop.id}`}>
+                              <Link to={`/title?propertyId=${prop.id}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <Shield className="h-3 w-3" /> Title
                                   <ChevronRight className="h-3 w-3" />
                                 </Button>
                               </Link>
-                              <Link href={`/litigation?propertyId=${prop.id}`}>
+                              <Link to={`/litigation?propertyId=${prop.id}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <Gavel className="h-3 w-3" /> Litigation
                                   <ChevronRight className="h-3 w-3" />
                                 </Button>
                               </Link>
-                              <Link href={`/fraud?propertyId=${prop.id}`}>
+                              <Link to={`/fraud?propertyId=${prop.id}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <AlertTriangle className="h-3 w-3" /> Fraud
                                   <ChevronRight className="h-3 w-3" />
                                 </Button>
                               </Link>
-                              <Link href={`/rera?propertyId=${prop.id}`}>
+                              <Link to={`/rera?propertyId=${prop.id}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <MapPin className="h-3 w-3" /> RERA
                                   <ChevronRight className="h-3 w-3" />
                                 </Button>
                               </Link>
-                              <Link href={`/market?city=${prop.city}`}>
+                              <Link to={`/market?city=${prop.city}`}>
                                 <Button variant="ghost" size="sm" className="h-8 text-xs gap-1">
                                   <TrendingUp className="h-3 w-3" /> Market Intel
                                   <ChevronRight className="h-3 w-3" />

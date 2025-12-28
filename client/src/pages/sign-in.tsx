@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { SEO, seoData } from "@/components/seo";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ export default function SignIn() {
   const [otpSent, setOtpSent] = useState(false);
   const [requiresVerification, setRequiresVerification] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { 
     login, 
@@ -154,7 +154,7 @@ export default function SignIn() {
       <div className="min-h-screen bg-background flex flex-col">
         <SEO {...seoData.signIn} />
         <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
@@ -213,7 +213,7 @@ export default function SignIn() {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO {...seoData.signIn} />
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -223,7 +223,7 @@ export default function SignIn() {
         </Link>
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/">Back Home</Link>
+            <Link to="/">Back Home</Link>
           </Button>
         </div>
       </header>
@@ -268,7 +268,7 @@ export default function SignIn() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <Label htmlFor="password">Password</Label>
-                        <Link href="/forgot-password">
+                        <Link to="/forgot-password">
                           <span className="text-xs text-primary hover:underline cursor-pointer" data-testid="link-forgot-password">
                             Forgot password?
                           </span>
@@ -399,7 +399,7 @@ export default function SignIn() {
 
               <div className="mt-6 text-center text-sm text-muted-foreground">
                 Don't have an account?{" "}
-                <Link href="/sign-up">
+                <Link to="/sign-up">
                   <span className="text-primary hover:underline cursor-pointer" data-testid="link-signup">
                     Create account
                   </span>

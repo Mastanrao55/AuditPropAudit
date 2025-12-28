@@ -1,4 +1,4 @@
-import { Link, useLocation, useSearch } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [success, setSuccess] = useState(false);
   const [token, setToken] = useState("");
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const { resetPassword, resetPasswordPending } = useAuth();
 
@@ -82,7 +82,7 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-background flex flex-col">
         <SEO {...seoData.resetPassword} />
         <header className="container mx-auto px-4 py-6">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
@@ -104,7 +104,7 @@ export default function ResetPassword() {
                   This password reset link is invalid or has expired. Please request a new one.
                 </p>
                 <div className="pt-4">
-                  <Link href="/forgot-password">
+                  <Link to="/forgot-password">
                     <Button className="w-full" data-testid="button-request-new">
                       Request New Link
                     </Button>
@@ -123,7 +123,7 @@ export default function ResetPassword() {
       <div className="min-h-screen bg-background flex flex-col">
         <SEO {...seoData.resetPassword} />
         <header className="container mx-auto px-4 py-6">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
@@ -145,7 +145,7 @@ export default function ResetPassword() {
                   Your password has been successfully reset. You can now sign in with your new password.
                 </p>
                 <div className="pt-4">
-                  <Link href="/sign-in">
+                  <Link to="/sign-in">
                     <Button className="w-full" data-testid="button-goto-signin">
                       Go to Sign In
                     </Button>
@@ -163,7 +163,7 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-background flex flex-col">
       <SEO {...seoData.resetPassword} />
       <header className="container mx-auto px-4 py-6">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />

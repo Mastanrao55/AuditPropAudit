@@ -28,8 +28,8 @@ async function sendEmail(options: EmailOptions): Promise<{ success: boolean; err
         from: { email: getFromEmail(), name: APP_NAME },
         subject: options.subject,
         content: [
-          { type: "text/html", value: options.html },
           ...(options.text ? [{ type: "text/plain", value: options.text }] : []),
+          { type: "text/html", value: options.html },
         ],
       }),
     });

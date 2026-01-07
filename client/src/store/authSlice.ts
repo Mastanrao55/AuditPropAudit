@@ -62,6 +62,24 @@ export const loginAsync = createAsyncThunk(
   }
 );
 
+// Async thunk for logout
+export const logoutAsync = createAsyncThunk(
+  "auth/logout",
+  async () => {
+    const response = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: "Logout failed" }));
+      throw new Error(error.error || "Logout failed");
+    }
+
+    return await response.json();
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -88,6 +106,20 @@ const authSlice = createSlice({
       })
       .addCase(loginAsync.rejected, (state) => {
         // Handle login error if needed
+      })
+      .addCase(logoutAsync.pending, (state) => {
+        // Logout is pending
+      })
+      .addCase(logoutAsync.fulfilled, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem("auth-user");
+      })
+      .addCase(logoutAsync.rejected, (state) => {
+        // Even if API call fails, clear local state
+        state.user = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem("auth-user");
       });
   },
 });

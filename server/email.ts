@@ -9,6 +9,24 @@ interface EmailOptions {
   text?: string;
 }
 
+/**
+ * Get the base URL for the application, detecting Replit domains if available
+ */
+function getBaseUrl(): string {
+  // Check for Replit production domain first
+  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
+    return `https://${process.env.REPLIT_INTERNAL_APP_DOMAIN}`;
+  }
+  
+  // Check for Replit dev domain
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  
+  // Fall back to APP_URL or localhost
+  return process.env.APP_URL || "http://localhost:5001";
+}
+
 async function sendEmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   if (!SENDGRID_API_KEY) {
     console.log("Email service not configured. Would send:", options.subject, "to", options.to);
@@ -27,8 +45,8 @@ async function sendEmail(options: EmailOptions): Promise<{ success: boolean; err
         from: { email: FROM_EMAIL, name: APP_NAME },
         subject: options.subject,
         content: [
-          { type: "text/html", value: options.html },
           ...(options.text ? [{ type: "text/plain", value: options.text }] : []),
+          { type: "text/html", value: options.html },
         ],
       }),
     });
@@ -47,7 +65,7 @@ async function sendEmail(options: EmailOptions): Promise<{ success: boolean; err
 }
 
 export async function sendVerificationEmail(email: string, token: string): Promise<{ success: boolean; error?: string }> {
-  const baseUrl = process.env.APP_URL || "http://localhost:5000";
+  const baseUrl = getBaseUrl();
   const verificationLink = `${baseUrl}/verify-email?token=${token}`;
   
   const html = `
@@ -99,7 +117,7 @@ If you didn't create an account with us, you can safely ignore this email.
 }
 
 export async function sendPasswordResetEmail(email: string, token: string): Promise<{ success: boolean; error?: string }> {
-  const baseUrl = process.env.APP_URL || "http://localhost:5000";
+  const baseUrl = getBaseUrl();
   const resetLink = `${baseUrl}/reset-password?token=${token}`;
   
   const html = `

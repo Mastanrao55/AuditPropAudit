@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, ShieldCheck, Search, Building2, Download, Menu, X } from "lucide-react";
@@ -10,7 +10,7 @@ import { SEO, seoData } from "@/components/seo";
 export default function LandingPage() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSampleReport = () => {
@@ -70,37 +70,37 @@ export default function LandingPage() {
             <span className="font-bold text-xl tracking-tight">AssetzAudit</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <Link href="/solutions" className="hover:text-foreground transition-colors" data-testid="link-solutions">
+            <Link to="/solutions" className="hover:text-foreground transition-colors" data-testid="link-solutions">
               Solutions
             </Link>
-            <Link href="/nri-solutions" className="hover:text-foreground transition-colors" data-testid="link-nri-solutions">
+            <Link to="/nri-solutions" className="hover:text-foreground transition-colors" data-testid="link-nri-solutions">
               NRI Solutions
             </Link>
-            <Link href="/data-sources" className="hover:text-foreground transition-colors" data-testid="link-data-sources">
+            <Link to="/data-sources" className="hover:text-foreground transition-colors" data-testid="link-data-sources">
               Data Sources
             </Link>
-            <Link href="/pricing" className="hover:text-foreground transition-colors" data-testid="link-pricing">
+            <Link to="/pricing" className="hover:text-foreground transition-colors" data-testid="link-pricing">
               Pricing
             </Link>
-            <Link href="/api" className="hover:text-foreground transition-colors" data-testid="link-api">
+            <Link to="/api" className="hover:text-foreground transition-colors" data-testid="link-api">
               API
             </Link>
-            <Link href="/contact" className="hover:text-foreground transition-colors" data-testid="link-contact">
+            <Link to="/contact" className="hover:text-foreground transition-colors" data-testid="link-contact">
               Contact
             </Link>
-            <Link href="/news" className="hover:text-foreground transition-colors" data-testid="link-news">
+            <Link to="/news" className="hover:text-foreground transition-colors" data-testid="link-news">
               News
             </Link>
-            <Link href="/blog" className="hover:text-foreground transition-colors" data-testid="link-blog">
+            <Link to="/blog" className="hover:text-foreground transition-colors" data-testid="link-blog">
               Blog
             </Link>
           </nav>
           <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
-              <Link href="/sign-in">Sign In</Link>
+              <Link to="/sign-in">Sign In</Link>
             </Button>
             <Button asChild>
-              <Link href="/sign-in">Get Started</Link>
+              <Link to="/sign-in">Get Started</Link>
             </Button>
           </div>
           <Button
@@ -118,36 +118,36 @@ export default function LandingPage() {
         {isMobileMenuOpen && (
           <nav className="md:hidden mt-4 pb-4 border-b border-border">
             <div className="flex flex-col space-y-3 text-sm font-medium text-muted-foreground">
-              <Link href="/solutions" className="hover:text-foreground transition-colors py-2" data-testid="link-solutions-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/solutions" className="hover:text-foreground transition-colors py-2" data-testid="link-solutions-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 Solutions
               </Link>
-              <Link href="/nri-solutions" className="hover:text-foreground transition-colors py-2" data-testid="link-nri-solutions-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/nri-solutions" className="hover:text-foreground transition-colors py-2" data-testid="link-nri-solutions-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 NRI Solutions
               </Link>
-              <Link href="/data-sources" className="hover:text-foreground transition-colors py-2" data-testid="link-data-sources-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/data-sources" className="hover:text-foreground transition-colors py-2" data-testid="link-data-sources-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 Data Sources
               </Link>
-              <Link href="/pricing" className="hover:text-foreground transition-colors py-2" data-testid="link-pricing-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/pricing" className="hover:text-foreground transition-colors py-2" data-testid="link-pricing-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 Pricing
               </Link>
-              <Link href="/api" className="hover:text-foreground transition-colors py-2" data-testid="link-api-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/api" className="hover:text-foreground transition-colors py-2" data-testid="link-api-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 API
               </Link>
-              <Link href="/contact" className="hover:text-foreground transition-colors py-2" data-testid="link-contact-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/contact" className="hover:text-foreground transition-colors py-2" data-testid="link-contact-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 Contact
               </Link>
-              <Link href="/news" className="hover:text-foreground transition-colors py-2" data-testid="link-news-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/news" className="hover:text-foreground transition-colors py-2" data-testid="link-news-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 News
               </Link>
-              <Link href="/blog" className="hover:text-foreground transition-colors py-2" data-testid="link-blog-mobile" onClick={() => setIsMobileMenuOpen(false)}>
+              <Link to="/blog" className="hover:text-foreground transition-colors py-2" data-testid="link-blog-mobile" onClick={() => setIsMobileMenuOpen(false)}>
                 Blog
               </Link>
               <div className="flex flex-col gap-2 pt-3 border-t border-border">
                 <Button variant="ghost" asChild className="justify-start">
-                  <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>Sign In</Link>
+                  <Link to="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>Sign In</Link>
                 </Button>
                 <Button asChild>
-                  <Link href="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
+                  <Link to="/sign-in" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
                 </Button>
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" className="h-12 px-8 text-lg gap-2" asChild>
-              <Link href="/sign-in">
+              <Link to="/sign-in">
                 Start Free Audit <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

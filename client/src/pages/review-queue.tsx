@@ -11,7 +11,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { CheckCircle2, XCircle, AlertTriangle, Eye, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,7 +31,7 @@ export default function ReviewQueue() {
       description: `Property ${id} has been marked as verified.`,
       variant: "default",
     });
-  };
+  };  
 
   return (
     <Layout>
@@ -110,7 +110,7 @@ export default function ReviewQueue() {
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button size="sm" variant="outline" className="gap-1" asChild>
-                        <Link href={`/property/${property.id}`}>
+                        <Link to={`/property/${property.id}`}>
                           <Eye className="h-3 w-3" /> Review
                         </Link>
                       </Button>

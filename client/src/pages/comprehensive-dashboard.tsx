@@ -20,10 +20,10 @@ import {
   Gavel,
   Landmark,
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useNavigate } from "react-router-dom";
 
 export default function ComprehensiveDashboard() {
-  const [, navigate] = useLocation();
+  const navigate = useNavigate();
 
   const features = [
     {

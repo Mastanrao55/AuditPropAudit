@@ -1,14 +1,7 @@
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { db } from "./src/db";
-import { 
-  users, 
-  emailVerificationTokens, 
-  passwordResetTokens, 
-  otpChallenges,
-  type User 
-} from "@shared/schema";
-import { eq, and, gt, isNull } from "drizzle-orm";
+import { type User } from "@shared/schema";
+import * as userRepo from "../repositories/user.repo";
 
 const SALT_ROUNDS = 12;
 const TOKEN_EXPIRY_HOURS = 24;
@@ -44,34 +37,27 @@ export async function createUser(data: {
   const hashedPassword = await hashPassword(data.password);
   const username = data.email.split("@")[0] + "_" + crypto.randomBytes(4).toString("hex");
   
-  const [user] = await db.insert(users).values({
+  const user = await userRepo.createUser({
     username,
     email: data.email,
     hashedPassword,
     fullName: data.fullName,
     phoneNumber: data.phoneNumber || null,
-    role: "user",
-    status: "active",
-    emailVerified: false,
-    phoneVerified: false,
-  }).returning();
+  });
   
   return user;
 }
 
 export async function getUserByEmail(email: string): Promise<User | undefined> {
-  const [user] = await db.select().from(users).where(eq(users.email, email));
-  return user;
+  return userRepo.getUserByEmail(email);
 }
 
 export async function getUserById(id: string): Promise<User | undefined> {
-  const [user] = await db.select().from(users).where(eq(users.id, id));
-  return user;
+  return userRepo.getUserById(id);
 }
 
 export async function getUserByPhone(phoneNumber: string): Promise<User | undefined> {
-  const [user] = await db.select().from(users).where(eq(users.phoneNumber, phoneNumber));
-  return user;
+  return userRepo.getUserByPhone(phoneNumber);
 }
 
 export async function createEmailVerificationToken(userId: string): Promise<string> {
@@ -79,11 +65,7 @@ export async function createEmailVerificationToken(userId: string): Promise<stri
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
   
-  await db.insert(emailVerificationTokens).values({
-    userId,
-    tokenHash,
-    expiresAt,
-  });
+  await userRepo.createEmailVerificationToken(userId, tokenHash, expiresAt);
   
   return token;
 }
@@ -91,27 +73,14 @@ export async function createEmailVerificationToken(userId: string): Promise<stri
 export async function verifyEmailToken(token: string): Promise<{ success: boolean; userId?: string; error?: string }> {
   const tokenHash = hashToken(token);
   
-  const [tokenRecord] = await db.select()
-    .from(emailVerificationTokens)
-    .where(
-      and(
-        eq(emailVerificationTokens.tokenHash, tokenHash),
-        gt(emailVerificationTokens.expiresAt, new Date()),
-        isNull(emailVerificationTokens.usedAt)
-      )
-    );
+  const tokenRecord = await userRepo.getEmailVerificationToken(tokenHash);
   
   if (!tokenRecord) {
     return { success: false, error: "Invalid or expired verification link" };
   }
   
-  await db.update(emailVerificationTokens)
-    .set({ usedAt: new Date() })
-    .where(eq(emailVerificationTokens.id, tokenRecord.id));
-  
-  await db.update(users)
-    .set({ emailVerified: true, updatedAt: new Date() })
-    .where(eq(users.id, tokenRecord.userId));
+  await userRepo.markEmailVerificationTokenAsUsed(tokenRecord.id);
+  await userRepo.updateUserEmailVerified(tokenRecord.userId);
   
   return { success: true, userId: tokenRecord.userId };
 }
@@ -121,11 +90,7 @@ export async function createPasswordResetToken(userId: string): Promise<string> 
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
   
-  await db.insert(passwordResetTokens).values({
-    userId,
-    tokenHash,
-    expiresAt,
-  });
+  await userRepo.createPasswordResetToken(userId, tokenHash, expiresAt);
   
   return token;
 }
@@ -133,15 +98,7 @@ export async function createPasswordResetToken(userId: string): Promise<string> 
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
   const tokenHash = hashToken(token);
   
-  const [tokenRecord] = await db.select()
-    .from(passwordResetTokens)
-    .where(
-      and(
-        eq(passwordResetTokens.tokenHash, tokenHash),
-        gt(passwordResetTokens.expiresAt, new Date()),
-        isNull(passwordResetTokens.usedAt)
-      )
-    );
+  const tokenRecord = await userRepo.getPasswordResetToken(tokenHash);
   
   if (!tokenRecord) {
     return { success: false, error: "Invalid or expired reset link" };
@@ -149,13 +106,8 @@ export async function resetPasswordWithToken(token: string, newPassword: string)
   
   const hashedPassword = await hashPassword(newPassword);
   
-  await db.update(passwordResetTokens)
-    .set({ usedAt: new Date() })
-    .where(eq(passwordResetTokens.id, tokenRecord.id));
-  
-  await db.update(users)
-    .set({ hashedPassword, updatedAt: new Date() })
-    .where(eq(users.id, tokenRecord.userId));
+  await userRepo.markPasswordResetTokenAsUsed(tokenRecord.id);
+  await userRepo.updateUserPassword(tokenRecord.userId, hashedPassword);
   
   return { success: true };
 }
@@ -169,15 +121,13 @@ export async function createOTPChallenge(
   const codeHash = hashToken(otp);
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
   
-  const [challenge] = await db.insert(otpChallenges).values({
+  const challenge = await userRepo.createOTPChallenge({
     userId: userId || null,
     channel,
     destination,
     codeHash,
-    attempts: 0,
-    maxAttempts: OTP_MAX_ATTEMPTS,
     expiresAt,
-  }).returning();
+  });
   
   return { otp, challengeId: challenge.id };
 }
@@ -188,17 +138,7 @@ export async function verifyOTP(
 ): Promise<{ success: boolean; userId?: string | null; error?: string }> {
   const codeHash = hashToken(code);
   
-  const [challenge] = await db.select()
-    .from(otpChallenges)
-    .where(
-      and(
-        eq(otpChallenges.destination, destination),
-        gt(otpChallenges.expiresAt, new Date()),
-        isNull(otpChallenges.verifiedAt)
-      )
-    )
-    .orderBy(otpChallenges.createdAt)
-    .limit(1);
+  const challenge = await userRepo.getActiveOTPChallenge(destination);
   
   if (!challenge) {
     return { success: false, error: "No active OTP found. Please request a new one." };
@@ -209,21 +149,15 @@ export async function verifyOTP(
   }
   
   if (challenge.codeHash !== codeHash) {
-    await db.update(otpChallenges)
-      .set({ attempts: (challenge.attempts || 0) + 1 })
-      .where(eq(otpChallenges.id, challenge.id));
+    await userRepo.incrementOTPAttempts(challenge.id, (challenge.attempts || 0) + 1);
     
     return { success: false, error: "Invalid OTP. Please try again." };
   }
   
-  await db.update(otpChallenges)
-    .set({ verifiedAt: new Date() })
-    .where(eq(otpChallenges.id, challenge.id));
+  await userRepo.markOTPAsVerified(challenge.id);
   
   if (challenge.userId) {
-    await db.update(users)
-      .set({ phoneVerified: true, updatedAt: new Date() })
-      .where(eq(users.id, challenge.userId));
+    await userRepo.updateUserPhoneVerified(challenge.userId);
   }
   
   return { success: true, userId: challenge.userId };
@@ -231,13 +165,10 @@ export async function verifyOTP(
 
 export async function updateUserPassword(userId: string, newPassword: string): Promise<void> {
   const hashedPassword = await hashPassword(newPassword);
-  await db.update(users)
-    .set({ hashedPassword, updatedAt: new Date() })
-    .where(eq(users.id, userId));
+  await userRepo.updateUserPassword(userId, hashedPassword);
 }
 
 export async function updateLastLogin(userId: string): Promise<void> {
-  await db.update(users)
-    .set({ lastLoginAt: new Date() })
-    .where(eq(users.id, userId));
+  await userRepo.updateLastLogin(userId);
 }
+

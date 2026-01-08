@@ -1,5 +1,4 @@
-import { useRoute } from "wouter";
-import { Link } from "wouter";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, Calendar, User, ArrowLeft, Share2 } from "lucide-react";
 
@@ -399,17 +398,17 @@ const articles: Record<string, Article> = {
 };
 
 export default function BlogArticle() {
-  const [, params] = useRoute("/blog/:slug");
+  const { slug } = useParams<{ slug: string }>();
   
-  if (!params?.slug) {
+  if (!slug) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center">
         <h1>Article not found</h1>
       </div>
     );
   }
-
-  const article = articles[params.slug as string];
+  
+  const article = articles[slug as string];
 
   if (!article) {
     return (

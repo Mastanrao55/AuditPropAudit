@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Search, 
@@ -25,14 +25,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/store/useAuth";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [location] = useLocation();
+  const location = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { user, logout } = useAuth();
 
@@ -86,11 +86,11 @@ export function Layout({ children }: LayoutProps) {
 
       <div className="flex-1 py-6 px-4 space-y-1">
         {navigation.map((item) => {
-          const isActive = location === item.href;
+          const isActive = location.pathname === item.href;
           return (
             <Link 
               key={item.name} 
-              href={item.href}
+              to={item.href}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer",
                 isActive

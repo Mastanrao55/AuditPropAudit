@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +25,7 @@ export default function Pricing() {
       ],
       includesOffline: false,
       includesNRI: false,
-      popular: true,
+      popular: true,  
     },
     {
       name: "Deep Search Credits",
@@ -78,7 +78,7 @@ export default function Pricing() {
       <SEO {...seoData.pricing} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -87,7 +87,7 @@ export default function Pricing() {
           </div>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/">
+          <Link to="/">
             <Button variant="ghost">Back Home</Button>
           </Link>
         </div>
@@ -183,7 +183,7 @@ export default function Pricing() {
                         variant={credit.popular || credit.highlighted ? "default" : "outline"}
                         asChild
                       >
-                        <Link href="/contact">Purchase Credits</Link>
+                        <Link to="/contact">Purchase Credits</Link>
                       </Button>
 
                       {/* Info badges */}
@@ -284,9 +284,10 @@ export default function Pricing() {
               </p>
               <div className="flex gap-4 justify-center">
                 <Button variant="default" asChild>
-                  <Link href="/contact">Request Bulk Pricing</Link>
+                  <Link to="/contact">Request Bulk Pricing</Link>
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" asChild>
+                  <Link to="/contact">Schedule a Demo</Link>
                   Schedule a Demo
                 </Button>
               </div>

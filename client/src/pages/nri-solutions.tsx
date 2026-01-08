@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Globe, Building2, Shield, TrendingUp, CheckCircle2, MapPin, DollarSign, BookOpen, Lock } from "lucide-react";
@@ -10,7 +10,7 @@ export default function NRISolutions() {
       <SEO {...seoData.nriSolutions} />
       {/* Navigation */}
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/">
+          <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -20,7 +20,7 @@ export default function NRISolutions() {
         </Link>
         <div className="flex items-center gap-4">
           <Button variant="ghost" asChild>
-            <Link href="/">Back Home</Link>
+            <Link to="/">Back Home</Link>
           </Button>
         </div>
       </header>
@@ -42,12 +42,12 @@ export default function NRISolutions() {
               </p>
               <div className="flex gap-4">
                 <Button size="lg" asChild>
-                  <Link href="/nri">
+                  <Link to="/nri">
                     Explore NRI Suite <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/sign-in">Get Started</Link>
+                  <Link to="/sign-in">Get Started</Link>
                 </Button>
               </div>
             </div>
@@ -401,12 +401,12 @@ export default function NRISolutions() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button size="lg" asChild>
-                  <Link href="/sign-in">
+                  <Link to="/sign-in">
                     Start NRI Audit <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
-                  <Link href="/nri">View Full NRI Suite</Link>
+                  <Link to="/nri">View Full NRI Suite</Link>
                 </Button>
               </div>
             </div>

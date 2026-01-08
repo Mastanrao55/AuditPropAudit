@@ -2,17 +2,10 @@ import { type Server } from "node:http";
 
 import express, { type Express, type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
+import { checkDatabaseHealth, logConfigurationSummary } from "./src/utils/supabase-helpers";
+import { pool } from "./src/db";
+import { log } from "./src/utils/logger";
+import { getPort } from "./src/config/env";
 
 export const app = express();
 
@@ -61,6 +54,18 @@ app.use((req, res, next) => {
 export default async function runApp(
   setup: (app: Express, server: Server) => Promise<void>,
 ) {
+  try {
+    logConfigurationSummary();
+    
+    const isHealthy = await checkDatabaseHealth(pool);
+    if (isHealthy) {
+      log("Supabase database connection established", "supabase");
+    } else {
+      log("WARNING: Database health check failed", "supabase");
+    }
+  } catch (error) {
+    log(`Error initializing Supabase: ${error instanceof Error ? error.message : String(error)}`, "supabase");
+  }
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -79,12 +84,8 @@ export default async function runApp(
   // Other ports are firewalled. Default to 5000 if not specified.
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  const port = getPort();
+  server.listen(port, "127.0.0.1", () => {
     log(`serving on port ${port}`);
   });
 }

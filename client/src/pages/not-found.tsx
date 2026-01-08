@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Home, Search, ArrowLeft, FileQuestion } from "lucide-react";
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { SEO, seoData } from "@/components/seo";
 
 export default function NotFound() {
@@ -9,7 +9,7 @@ export default function NotFound() {
       <SEO {...seoData.notFound} />
       
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <Link href="/">
+        <Link to="/">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
@@ -40,13 +40,13 @@ export default function NotFound() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="gap-2" asChild>
-              <Link href="/">
+              <Link to="/">
                 <Home className="h-4 w-4" />
                 Go to Home
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="gap-2" asChild>
-              <Link href="/dashboard">
+              <Link to="/dashboard">
                 <Search className="h-4 w-4" />
                 Property Search
               </Link>
@@ -57,19 +57,19 @@ export default function NotFound() {
             <p className="text-sm text-muted-foreground mb-4">Popular pages you might be looking for:</p>
             <div className="flex flex-wrap justify-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/solutions">Solutions</Link>
+                <Link to="/solutions">Solutions</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/pricing">Pricing</Link>
+                <Link to="/pricing">Pricing</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/blog">Blog</Link>
+                <Link to="/blog">Blog</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/contact">Contact</Link>
+                <Link to="/contact">Contact</Link>
               </Button>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/sign-in">Sign In</Link>
+                <Link to="/sign-in">Sign In</Link>
               </Button>
             </div>
           </div>

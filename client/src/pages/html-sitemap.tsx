@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link } from "react-router-dom";
 import { Shield, Home, Search, FileText, Users, Building2, Scale, TrendingUp, CreditCard, Code, Mail, Newspaper, BookOpen, Settings, ExternalLink } from "lucide-react";
 import { SEO, seoData } from "@/components/seo";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,7 +131,7 @@ export default function HTMLSitemap() {
       
       <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/">
+          <Link to="/">
             <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" data-testid="link-home">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
@@ -140,10 +140,10 @@ export default function HTMLSitemap() {
             </div>
           </Link>
           <nav className="flex items-center gap-4">
-            <Link href="/dashboard">
+            <Link to="/dashboard">
               <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer" data-testid="link-dashboard">Property Search</span>
             </Link>
-            <Link href="/sign-in">
+            <Link to="/sign-in">
               <span className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer" data-testid="link-signin">Sign In</span>
             </Link>
           </nav>
@@ -177,7 +177,7 @@ export default function HTMLSitemap() {
                     <ul className="space-y-3">
                       {section.links.map((link) => (
                         <li key={link.href}>
-                          <Link href={link.href}>
+                          <Link to={link.href}>
                             <div className="group flex items-start gap-2 cursor-pointer" data-testid={`sitemap-link-${link.href.replace(/\//g, '-').slice(1) || 'home'}`}>
                               <ExternalLink className="h-4 w-4 mt-0.5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
                               <div>
@@ -227,7 +227,7 @@ export default function HTMLSitemap() {
         <div className="container mx-auto px-4 text-center">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} AssetzAudit. All rights reserved. | 
-            <Link href="/contact">
+            <Link to="/contact">
               <span className="ml-1 hover:text-foreground cursor-pointer">Contact Us</span>
             </Link>
           </p>

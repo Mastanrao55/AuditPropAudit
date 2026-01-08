@@ -9,6 +9,9 @@ import { getPort } from "./src/config/env";
 
 export const app = express();
 
+// Trust proxy to correctly detect protocol and host behind Replit's reverse proxy
+app.set('trust proxy', true);
+
 declare module 'http' {
   interface IncomingMessage {
     rawBody: unknown

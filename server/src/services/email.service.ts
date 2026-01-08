@@ -47,9 +47,9 @@ async function sendEmail(options: EmailOptions): Promise<{ success: boolean; err
   }
 }
 
-export async function sendVerificationEmail(email: string, token: string): Promise<{ success: boolean; error?: string }> {
-  const baseUrl = getAppUrl();
-  const verificationLink = `${baseUrl}/verify-email?token=${token}`;
+export async function sendVerificationEmail(email: string, token: string, baseUrl?: string): Promise<{ success: boolean; error?: string }> {
+  const appUrl = baseUrl || getAppUrl();
+  const verificationLink = `${appUrl}/verify-email?token=${token}`;
   
   const html = `
     <!DOCTYPE html>
@@ -99,9 +99,9 @@ If you didn't create an account with us, you can safely ignore this email.
   });
 }
 
-export async function sendPasswordResetEmail(email: string, token: string): Promise<{ success: boolean; error?: string }> {
-  const baseUrl = getAppUrl();
-  const resetLink = `${baseUrl}/reset-password?token=${token}`;
+export async function sendPasswordResetEmail(email: string, token: string, baseUrl?: string): Promise<{ success: boolean; error?: string }> {
+  const appUrl = baseUrl || getAppUrl();
+  const resetLink = `${appUrl}/reset-password?token=${token}`;
   
   const html = `
     <!DOCTYPE html>

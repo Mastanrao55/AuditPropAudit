@@ -13,6 +13,24 @@ import * as auth from "../services/auth.service";
 import { sendVerificationEmail, sendPasswordResetEmail, sendOTPEmail } from "../services/email.service";
 import { sendOTPSMS } from "../services/sms.service";
 
+/**
+ * Extract base URL from request, falling back to environment-based detection
+ */
+function getBaseUrlFromRequest(req: Request): string {
+  // Try to get from request headers first (most reliable)
+  const protocol = req.protocol || (req.secure ? 'https' : 'http');
+  const host = req.get('host');
+  if (host) {
+    return `${protocol}://${host}`;
+  }
+  
+  // Fall back to environment-based detection (already handled in getAppUrl)
+  return process.env.APP_URL || 
+         (process.env.REPLIT_INTERNAL_APP_DOMAIN ? `https://${process.env.REPLIT_INTERNAL_APP_DOMAIN}` : 
+          (process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : 
+           "http://localhost:5001"));
+}
+
 // OTP request rate limiting (in-memory, per phone number)
 const otpRequestCounts = new Map<string, { count: number; resetAt: number }>();
 const OTP_RATE_LIMIT = 3; // Max requests per window
@@ -35,7 +53,8 @@ export const registerController = async (req: Request, res: Response) => {
     });
     
     const token = await auth.createEmailVerificationToken(user.id);
-    await sendVerificationEmail(user.email!, token);
+    const baseUrl = getBaseUrlFromRequest(req);
+    await sendVerificationEmail(user.email!, token, baseUrl);
     
     res.json({ 
       success: true, 
@@ -167,7 +186,8 @@ export const resendVerificationController = async (req: Request, res: Response) 
     }
     
     const token = await auth.createEmailVerificationToken(user.id);
-    await sendVerificationEmail(user.email!, token);
+    const baseUrl = getBaseUrlFromRequest(req);
+    await sendVerificationEmail(user.email!, token, baseUrl);
     
     res.json({ success: true, message: "Verification email sent" });
   } catch (error) {
@@ -183,7 +203,8 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
     const user = await auth.getUserByEmail(email);
     if (user) {
       const token = await auth.createPasswordResetToken(user.id);
-      await sendPasswordResetEmail(user.email!, token);
+      const baseUrl = getBaseUrlFromRequest(req);
+      await sendPasswordResetEmail(user.email!, token, baseUrl);
     }
     
     res.json({ 

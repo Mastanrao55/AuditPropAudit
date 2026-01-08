@@ -18,7 +18,18 @@ export function getSessionSecret(): string {
 }
 
 export function getAppUrl(): string {
-  return process.env.APP_URL || "http://localhost:5000";
+  // Check for Replit production domain first
+  if (process.env.REPLIT_INTERNAL_APP_DOMAIN) {
+    return `https://${process.env.REPLIT_INTERNAL_APP_DOMAIN}`;
+  }
+  
+  // Check for Replit dev domain
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  }
+  
+  // Fall back to APP_URL or localhost
+  return process.env.APP_URL || "http://localhost:5001";
 }
 
 export function getSendgridApiKey(): string | undefined {

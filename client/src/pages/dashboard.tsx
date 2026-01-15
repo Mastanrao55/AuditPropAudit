@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Filter, Download, AlertTriangle, CheckCircle2, Clock, Plus, Archive, Home, DollarSign, MapPin, Trash2, Shield, FileText, Gavel, TrendingUp, Loader2, ChevronRight, Activity } from "lucide-react";
 import { PropertyCard } from "@/components/property-card";
+import { LocationInput, LocationData } from "@/components/location-input";
 import { MOCK_PROPERTIES, stats, formatCurrency } from "@/lib/mockData";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +29,8 @@ export default function Dashboard() {
     address: "",
     city: "",
     state: "",
+    lat: "",
+    lng: "",
     propertyType: "RESIDENTIAL",
     transactionType: "BUY",
     estimatedValue: "",
@@ -116,6 +119,8 @@ export default function Dashboard() {
           address: "",
           city: "",
           state: "",
+          lat: "",
+          lng: "",
           propertyType: "RESIDENTIAL",
           transactionType: "BUY",
           estimatedValue: "",
@@ -297,28 +302,42 @@ export default function Dashboard() {
                     </select>
                   </div>
                   
+                  <LocationInput
+                    placeholder="Enter property address..."
+                    value={formData.address}
+                    onChange={(location: LocationData) => {
+                      console.log("location", location);
+                      setFormData({
+                        ...formData,
+                        address: location.formattedAddress,
+                        city: location.city || "",
+                        state: location.state || "",
+                        lat: location.lat.toString(),
+                        lng: location.lng.toString(),
+                      });
+                    }}
+                    className="w-full"
+                    data-testid="input-address"
+                  />
+
                   <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      placeholder="Address"
-                      value={formData.address}
-                      onChange={(e) => setFormData({...formData, address: e.target.value})}
-                      data-testid="input-address"
-                    />
                     <Input
                       placeholder="City"
                       value={formData.city}
                       onChange={(e) => setFormData({...formData, city: e.target.value})}
                       data-testid="input-city"
+                      // readOnly
                     />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
                     <Input
                       placeholder="State"
                       value={formData.state}
                       onChange={(e) => setFormData({...formData, state: e.target.value})}
                       data-testid="input-state"
+                      // readOnly
                     />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <select 
                       value={formData.transactionType}
                       onChange={(e) => setFormData({...formData, transactionType: e.target.value})}

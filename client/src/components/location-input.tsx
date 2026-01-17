@@ -56,6 +56,8 @@ export function LocationInput({
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const previousValueRef = useRef<string>(value);
+  const shouldPreserveFocusRef = useRef<boolean>(false);
+  const isInternalUpdateRef = useRef<boolean>(false);
   
   // Configuration constants
   const DEBOUNCE_DELAY = 500; // milliseconds
@@ -67,10 +69,13 @@ export function LocationInput({
   // Sync input value with prop value only when prop changes from parent
   useEffect(() => {
     // Only update if the value prop actually changed from parent (not from user typing)
-    if (value !== previousValueRef.current) {
+    // Skip if we're in the middle of an internal update to prevent focus loss
+    if (value !== previousValueRef.current && !isInternalUpdateRef.current) {
       setInputValue(value);
       previousValueRef.current = value;
     }
+    // Reset the internal update flag after syncing
+    isInternalUpdateRef.current = false;
   }, [value]);
 
   // Fetch autocomplete suggestions from RapidAPI
@@ -164,6 +169,17 @@ export function LocationInput({
       setSuggestions(predictions);
       setShowSuggestions(true);
       setIsLoading(false);
+      
+      // Preserve focus after state updates complete
+      requestAnimationFrame(() => {
+        if (shouldPreserveFocusRef.current && inputRef.current && document.activeElement !== inputRef.current) {
+          inputRef.current.focus();
+          // Restore cursor position if possible
+          const currentValue = inputRef.current.value || "";
+          const cursorPosition = inputRef.current.selectionStart || currentValue.length;
+          inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+        }
+      });
     } catch (error: any) {
       // Don't update state if request was aborted
       if (error.name === 'AbortError' || abortController.signal.aborted) {
@@ -173,12 +189,25 @@ export function LocationInput({
       setSuggestions([]);
       setShowSuggestions(false);
       setIsLoading(false);
+      
+      // Preserve focus after error state updates
+      requestAnimationFrame(() => {
+        if (shouldPreserveFocusRef.current && inputRef.current && document.activeElement !== inputRef.current) {
+          inputRef.current.focus();
+          const currentValue = inputRef.current.value || "";
+          const cursorPosition = inputRef.current.selectionStart || currentValue.length;
+          inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+        }
+      });
     }
   }, [rapidApiKey]);
 
   // Handle input change with debouncing
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    
+    // Mark that we're doing an internal update to prevent value prop sync from interfering
+    isInternalUpdateRef.current = true;
     setInputValue(newValue);
 
     // Clear previous debounce timer
@@ -493,19 +522,29 @@ export function LocationInput({
 
   return (
     <div className="relative">
-      <Input
-        ref={inputRef}
-        value={inputValue}
-        onChange={handleInputChange}
-        onFocus={() => {
-          if (suggestions.length > 0) {
-            setShowSuggestions(true);
-          }
-        }}
-        placeholder={placeholder}
-        className={cn("pr-10", className)}
-        disabled={disabled || isLoading}
-      />
+        <Input
+          ref={inputRef}
+          value={inputValue}
+          onChange={handleInputChange}
+          onFocus={() => {
+            shouldPreserveFocusRef.current = true;
+            if (suggestions.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
+          onBlur={() => {
+            // Only clear the focus preservation flag if we're not clicking on a suggestion
+            // Use a small delay to allow click events on suggestions to fire first
+            setTimeout(() => {
+              if (document.activeElement !== suggestionsRef.current && !suggestionsRef.current?.contains(document.activeElement)) {
+                shouldPreserveFocusRef.current = false;
+              }
+            }, 200);
+          }}
+          placeholder={placeholder}
+          className={cn("pr-10", className)}
+          disabled={disabled || isLoading}
+        />
       <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
         {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
